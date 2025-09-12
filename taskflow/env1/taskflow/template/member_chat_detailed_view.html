@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Chat - Alternative Design</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #f7f9fc;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #1a73e8;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h3 {
+      text-align: center;
+      padding: 15px;
+      font-size: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      margin: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .sidebar ul li {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .sidebar ul li:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* Chat Window */
+    .chat-window {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-header span {
+      color: #1a73e8;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f7f9fc;
+    }
+
+    .message {
+      margin: 12px 0;
+      max-width: 65%;
+      padding: 12px 16px;
+      border-radius: 15px;
+      font-size: 14px;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .message.sent {
+      background: #1a73e8;
+      color: #fff;
+      margin-left: auto;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.received {
+      background: #fff;
+      margin-right: auto;
+      border-bottom-left-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .message small {
+      display: block;
+      font-size: 10px;
+      margin-top: 5px;
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    /* Chat Input */
+    .chat-input {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-top: 1px solid #ddd;
+      background: #fff;
+    }
+
+    .chat-input button,
+    .chat-input label {
+      background: none;
+      border: none;
+      margin: 0 6px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #1a73e8;
+    }
+
+    .chat-input input[type="file"] {
+      display: none;
+    }
+
+    .chat-input input[type="text"] {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .chat-input .send-btn {
+      background: #1a73e8;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 50%;
+      margin-left: 8px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .chat-input .send-btn:hover {
+      background: #155ec1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>👥 Team</h3>
+    <ul>
+      <li>Ravi Kumar</li>
+      <li>Anjali Sharma</li>
+      <li>Vikram Singh</li>
+      <li>Priya Mehta</li>
+      <li>Dev Group</li>
+    </ul>
+  </div>
+
+  <!-- Chat Window -->
+  <div class="chat-window">
+    <div class="chat-header">
+      Dev Team Chat <span>● Online</span>
+    </div>
+
+    <div class="chat-messages">
+      <div class="message received">
+        Hi everyone, any update on today’s deployment? 
+        <small>09:15 AM</small>
+      </div>
+      <div class="message sent">
+        Yes, I pushed the bug fixes ✅
+        <small>09:17 AM</small>
+      </div>
+      <div class="message received">
+        Great, I’ll start testing now.
+        <small>09:20 AM</small>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input">
+      <button>😊</button>
+
+      <!-- Attach File -->
+      <label for="fileUpload">📎</label>
+      <input type="file" id="fileUpload" multiple>
+
+      <!-- Message Input -->
+      <input type="text" placeholder="Type your message...">
+
+      <!-- Send Button -->
+      <button class="send-btn">➤</button>
+    </div>
+  </div>
+
+</body>
+</html>

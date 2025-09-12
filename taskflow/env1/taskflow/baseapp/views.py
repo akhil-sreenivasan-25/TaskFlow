@@ -6,3 +6,9 @@ def test(request):
 
 def login(request):
     return render(request,"log_page.html")
+
+def tl_home(request):
+    return  render(request,"tl_dashboard.html")
+
+def member_home(request):
+    return  render(request,"member_dashboard.html")
