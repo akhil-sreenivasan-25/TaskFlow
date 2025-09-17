@@ -1,9 +1,18 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
 
 # Create your models here.
+#extention for user
+class CustomUser(AbstractUser):
+    designation = models.CharField(max_length=50, blank=True, null=True)
+    desig_prefix = models.CharField(max_length=2, blank=True, null=True)
+    
+
+
 #emplloyee details
 class Employee(models.Model):
-    empid=models.AutoField(primary_key=True )
+    empid=models.AutoField(primary_key=True)
     name=models.CharField(max_length=100)
     email=models.EmailField(unique=True)
     role=models.CharField(max_length=50)  # e.g., 'team_lead' or 'member'
