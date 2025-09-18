@@ -43,15 +43,15 @@
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div class="bg-white rounded-xl shadow-sm p-5">
           <p class="text-slate-500 text-sm">Total Projects</p>
-          <p class="text-3xl font-semibold">8</p>
+          <p class="text-3xl font-semibold">{{count.p_count}}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
           <p class="text-slate-500 text-sm">Active Tasks</p>
-          <p class="text-3xl font-semibold text-emerald-600">34</p>
+          <p class="text-3xl font-semibold text-emerald-600">{{count.t_count}}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
           <p class="text-slate-500 text-sm">Upcoming Deadlines</p>
-          <p class="text-3xl font-semibold text-amber-600">5</p>
+          <p class="text-3xl font-semibold text-amber-600">{{count.dl_count}}</p>
         </div>
       </section>
 

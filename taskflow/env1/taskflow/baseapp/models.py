@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser
 class CustomUser(AbstractUser):
     designation = models.CharField(max_length=50, blank=True, null=True)
     desig_prefix = models.CharField(max_length=2, blank=True, null=True)
+    empid = models.CharField(max_length=20, unique=True, blank=True, null=True)
     
 
 
@@ -22,6 +23,8 @@ class Employee(models.Model):
     def __str__(self):
         return self.name
     
+
+    
 #project details
 class Project(models.Model):
     projectid=models.AutoField(primary_key=True)
@@ -29,6 +32,7 @@ class Project(models.Model):
     description=models.TextField()
     start_date=models.DateField()
     end_date=models.DateField(null=True, blank=True)
+    status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='In Progress')
     team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects')
 
     def __str__(self):
