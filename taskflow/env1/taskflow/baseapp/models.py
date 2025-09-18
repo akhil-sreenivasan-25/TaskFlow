@@ -42,7 +42,7 @@ class Task(models.Model):
     taskid=models.AutoField(primary_key=True)
     title=models.CharField(max_length=200)
     description=models.TextField()
-    assigned_to=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='tasks')
+    assigned_to=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='e_tasks')
     project=models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks')
     status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='pending')
     priority=models.CharField(max_length=50, choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='medium')

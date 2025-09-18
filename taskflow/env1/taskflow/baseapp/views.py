@@ -34,7 +34,7 @@ def tl_home(request):
     if request.user.is_authenticated:
          u_id = int(request.user.id)
          id=CustomUser.objects.get(id=u_id).empid
-         emp_obj=Employee.objects.get(empid=id) 
+         emp_obj=Employee.objects.get(empid=id)          
          # find count - project task deadline
          if(emp_obj.led_projects.count()==0):
              project_count=0
@@ -42,16 +42,23 @@ def tl_home(request):
              deadline_count=0
          else:
              project_count= emp_obj.led_projects.exclude(status='completed').count()
-             task_count=emp_obj.tasks.exclude(status='completed').count()
-             day_differnce=date.today() + timedelta(days=5)
+             tl_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
+             task_count=Task.objects.filter(project__in=tl_projects).exclude(status='completed').count()
              #deadline count project + task
-             task_deadline_count=emp_obj.tasks.filter(due_date__lte=day_differnce).exclude(status='completed').count()
+             # tasks with due date within next 5 days and not completed
+             day_differnce=date.today() + timedelta(days=5) 
+             task_deadline_count=Task.objects.filter(project__in=tl_projects,due_date__lte=day_differnce).exclude(status='completed').count()
              pro_deadline_count=emp_obj.led_projects.filter(end_date__lte=day_differnce).exclude(status='completed').count()
              deadline_count=task_deadline_count + pro_deadline_count
-
          tl_count={"p_count":project_count,"t_count":task_count,'dl_count':deadline_count}
 
-         return  render(request,"tl_dashboard.html",{"count":tl_count})
+         #team management
+         # Select distinct employees who are assigned to tasks in any of the projects led by the current team lead (tl_projects)
+         tl_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
+         team_members=Employee.objects.filter(e_tasks__project__in=tl_projects).distinct().exclude(empid=emp_obj.empid)
+        
+
+         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members})
     else:
         return  HttpResponse("invalid user")
 

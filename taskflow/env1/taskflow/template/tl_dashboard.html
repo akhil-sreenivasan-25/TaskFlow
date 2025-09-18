@@ -40,6 +40,7 @@
       </header>
 
       <!-- KPI cards -->
+       <!-- count session -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div class="bg-white rounded-xl shadow-sm p-5">
           <p class="text-slate-500 text-sm">Total Projects</p>
@@ -75,16 +76,26 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="border-t">
-                    <td class="px-5 py-3">Akhil</td>
-                    <td class="px-5 py-3">Team Lead</td>
-                    <td class="px-5 py-3"><span class="text-emerald-600 font-medium">Active</span></td>
-                    <td class="px-5 py-3">12</td>
-                    <td class="px-5 py-3 text-center">
-                      <button class="px-2 py-1 text-blue-600 hover:underline">Reassign</button>
-                    </td>
-                  </tr>
-                  <tr class="border-t">
+                  {% for emp in emp_manage %}
+                    <tr class="border-t">
+                        <td class="px-5 py-3">{{emp.name}}</td>
+                        <td class="px-5 py-3">{{emp.role}}</td>
+                        <td class="px-5 py-3">
+                          <span class="text-emerald-600 font-medium">
+                            {% if emp.is_active  %}
+                              Active
+                            {% else %}
+                              Idle
+                            {% endif %}                          
+                          </span>
+                        </td>
+                        <td class="px-5 py-3">12</td>
+                        <td class="px-5 py-3 text-center">
+                          <button class="px-2 py-1 text-blue-600 hover:underline">Reassign</button>
+                        </td>                      
+                    </tr>
+                  {% endfor %}
+                  <!-- <tr class="border-t">
                     <td class="px-5 py-3">Sarah</td>
                     <td class="px-5 py-3">Developer</td>
                     <td class="px-5 py-3"><span class="text-amber-600 font-medium">Idle</span></td>
@@ -110,7 +121,7 @@
                     <td class="px-5 py-3 text-center">
                       <button class="px-2 py-1 text-blue-600 hover:underline">Reassign</button>
                     </td>
-                  </tr>
+                  </tr> -->
                 </tbody>
               </table>
             </div>
@@ -143,7 +154,7 @@
                 <div class="space-y-3">
                   <div class="p-3 bg-white rounded-md border">
                     <p class="font-medium">Implement Authentication</p>
-                    <div class="mt-1 text-xs text-slate-500">Due: Aug 24 • <span class="text-amber-600 font-medium">Medium</span></div>
+                    <div class="mt-1 text-xs text-slate-500">Due: Aug 24 • <span class="text-amber-600 font-medium">Medium</span></div> 
                   </div>
                   <div class="p-3 bg-white rounded-md border">
                     <p class="font-medium">Develop API</p>
