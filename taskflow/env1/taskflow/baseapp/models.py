@@ -33,7 +33,7 @@ class Project(models.Model):
     start_date=models.DateField()
     end_date=models.DateField(null=True, blank=True)
     status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='In Progress')
-    team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects')
+    team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects') # linked employee table. connectg the employee whos the tl of the project
 
     def __str__(self):
         return self.project_name
@@ -42,8 +42,8 @@ class Task(models.Model):
     taskid=models.AutoField(primary_key=True)
     title=models.CharField(max_length=200)
     description=models.TextField()
-    assigned_to=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='e_tasks')
-    project=models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks')
+    assigned_to=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='e_tasks') #linked employee table based on task assigning
+    project=models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks') #linked project table based on which project belong this task
     status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='pending')
     priority=models.CharField(max_length=50, choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='medium')
     due_date=models.DateField(null=True, blank=True)

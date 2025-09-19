@@ -2,6 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth import authenticate,login,logout
 from .models import CustomUser,Employee,Project,Task
 from datetime import date,timedelta
+from django.db.models import Count
 
 # Create your views here.
 def test(request):
@@ -55,6 +56,9 @@ def tl_home(request):
          #team management
          # Select distinct employees who are assigned to tasks in any of the projects led by the current team lead (tl_projects)
          tl_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
+         #for find task count foe each employee under specific tl. not completed
+         #task_det=Task.objects.filter(project__in=tl_projects).annotate(t_count=Count('assigned_to'))
+         #team_members=Employee.objects.distinct().exclude(empid=emp_obj.empid)
          team_members=Employee.objects.filter(e_tasks__project__in=tl_projects).distinct().exclude(empid=emp_obj.empid)
         
 
