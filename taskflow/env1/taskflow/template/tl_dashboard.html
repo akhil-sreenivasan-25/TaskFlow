@@ -89,7 +89,7 @@
                             {% endif %}                          
                           </span>
                         </td>
-                        <td class="px-5 py-3">10</td>
+                        <td class="px-5 py-3">{{test_data}}</td>
                         <td class="px-5 py-3 text-center">
                           <button class="px-2 py-1 text-blue-600 hover:underline">Reassign</button>
                         </td>                      
@@ -101,56 +101,57 @@
           </section>
 
           <!-- Task Tracking (Kanban) -->
-          <section class="bg-white rounded-xl shadow-sm">
+
+          
+            <section class="bg-white rounded-xl shadow-sm">
             <div class="p-5 border-b flex justify-between items-center">
               <h2 class="font-semibold text-lg">Task Tracking</h2>
               <div class="text-sm text-slate-500">Drag & drop (coming soon)</div>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
-              <!-- To Do -->
-              <div class="bg-slate-50 rounded-lg p-3">
-                <h3 class="font-medium mb-3">To Do</h3>
-                <div class="space-y-3">
-                  <div class="p-3 bg-white rounded-md border">
-                    <p class="font-medium">Design Homepage</p>
-                    <div class="mt-1 text-xs text-slate-500">Due: Aug 25 • <span class="text-rose-600 font-medium">High</span></div>
+              {% for task in pro_tasks %}
+                  <!-- To Do -->
+                  <div class="bg-slate-50 rounded-lg p-3">
+                    <h3 class="font-medium mb-3">To Do</h3>
+                    <div class="space-y-3">
+                      {% if task.status == 'pending' %}
+                        <div class="p-3 bg-white rounded-md border">
+                          <p class="font-medium">{{ task.title }}</p>
+                          <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
-                  <div class="p-3 bg-white rounded-md border">
-                    <p class="font-medium">Set up Database</p>
-                    <div class="mt-1 text-xs text-slate-500">Due: Aug 27 • <span class="text-amber-600 font-medium">Medium</span></div>
+                  <!-- In Progress -->
+                  <div class="bg-slate-50 rounded-lg p-3">
+                    <h3 class="font-medium mb-3">In Progress</h3>
+                    <div class="space-y-3">
+                      {% if task.status == 'in_progress' %}
+                        <div class="p-3 bg-white rounded-md border">
+                          <p class="font-medium">{{ task.title }}</p>
+                          <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
-                </div>
-              </div>
-              <!-- In Progress -->
-              <div class="bg-slate-50 rounded-lg p-3">
-                <h3 class="font-medium mb-3">In Progress</h3>
-                <div class="space-y-3">
-                  <div class="p-3 bg-white rounded-md border">
-                    <p class="font-medium">Implement Authentication</p>
-                    <div class="mt-1 text-xs text-slate-500">Due: Aug 24 • <span class="text-amber-600 font-medium">Medium</span></div> 
+                  <!-- Completed -->
+                  <div class="bg-slate-50 rounded-lg p-3">
+                    <h3 class="font-medium mb-3">Completed</h3>
+                    <div class="space-y-3">
+                      {% if task.status == 'completed' %}
+                        <div class="p-3 bg-white rounded-md border">
+                          <p class="font-medium">{{ task.title }}</p>
+                          <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
-                  <div class="p-3 bg-white rounded-md border">
-                    <p class="font-medium">Develop API</p>
-                    <div class="mt-1 text-xs text-slate-500">Due: Aug 28 • <span class="text-emerald-600 font-medium">Low</span></div>
-                  </div>
-                </div>
-              </div>
-              <!-- Completed -->
-              <div class="bg-slate-50 rounded-lg p-3">
-                <h3 class="font-medium mb-3">Completed</h3>
-                <div class="space-y-3">
-                  <div class="p-3 bg-white rounded-md border opacity-70">
-                    <p class="font-medium">Setup CI/CD</p>
-                    <div class="mt-1 text-xs text-slate-500">Done: Aug 18</div>
-                  </div>
-                  <div class="p-3 bg-white rounded-md border opacity-70">
-                    <p class="font-medium">Create Wireframes</p>
-                    <div class="mt-1 text-xs text-slate-500">Done: Aug 16</div>
-                  </div>
-                </div>
-              </div>
+              {% endfor %}
+              
             </div>
-          </section>
+            </section>
+          
         </div>
 
         <!-- Right column -->

@@ -57,12 +57,16 @@ def tl_home(request):
          # Select distinct employees who are assigned to tasks in any of the projects led by the current team lead (tl_projects)
          tl_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
          #for find task count foe each employee under specific tl. not completed
-         #task_det=Task.objects.filter(project__in=tl_projects).annotate(t_count=Count('assigned_to'))
+         #task_det=Employee.objects.filter(e_tasks__project__in=tl_projects).annotate(t_count=Count('e_task'))#.distinct()
          #team_members=Employee.objects.distinct().exclude(empid=emp_obj.empid)
+         task_det=0
          team_members=Employee.objects.filter(e_tasks__project__in=tl_projects).distinct().exclude(empid=emp_obj.empid)
-        
 
-         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members})
+         #task tracking
+         tl_all_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
+         tl_all_tasks=Task.objects.filter(project__in=tl_all_projects).values('title','due_date','priority','status')
+
+         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_all_tasks})
     else:
         return  HttpResponse("invalid user")
 
