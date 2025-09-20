@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth import authenticate,login,logout
 from .models import CustomUser,Employee,Project,Task
 from datetime import date,timedelta
-from django.db.models import Count
+from django.db.models import Count,ExpressionWrapper,IntegerField,Value
 
 # Create your views here.
 def test(request):
@@ -59,14 +59,23 @@ def tl_home(request):
          #for find task count foe each employee under specific tl. not completed
          #task_det=Employee.objects.filter(e_tasks__project__in=tl_projects).annotate(t_count=Count('e_task'))#.distinct()
          #team_members=Employee.objects.distinct().exclude(empid=emp_obj.empid)
-         task_det=0
-         team_members=Employee.objects.filter(e_tasks__project__in=tl_projects).distinct().exclude(empid=emp_obj.empid)
+         
+         team_members=Employee.objects.filter(e_tasks__project__in=tl_projects).distinct().exclude(empid=emp_obj.empid).annotate(member_task_count=Count('e_tasks'))
+         #member_task_count=Task
 
          #task tracking
-         tl_all_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
-         tl_all_tasks=Task.objects.filter(project__in=tl_all_projects).values('title','due_date','priority','status')
+         tl_all_tasks=Task.objects.filter(project__in=tl_projects).values('title','due_date','priority','status')
 
-         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_all_tasks})
+         #project progress
+         tl_projects=emp_obj.led_projects.exclude(status='completed').values_list('projectid', flat=True)
+         tl_tasks=Task.objects.filter(project__in=tl_projects).count()
+         # active task count group by project and status in in_progress and pending
+         tl_tasks_progress=Task.objects.filter(project__in=tl_projects,status__in=('in_progress','pending'))\
+            .values('project').annotate(t_count=ExpressionWrapper(Count('taskid') / Value(tl_tasks) * 100 , output_field=IntegerField()))\
+                .values('project','project__project_name','t_count')
+
+         task_det=0
+         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_tasks_progress})
     else:
         return  HttpResponse("invalid user")
 

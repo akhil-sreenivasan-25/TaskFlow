@@ -89,9 +89,9 @@
                             {% endif %}                          
                           </span>
                         </td>
-                        <td class="px-5 py-3">{{test_data}}</td>
+                        <td class="px-5 py-3">{{emp.member_task_count}}</td>
                         <td class="px-5 py-3 text-center">
-                          <button class="px-2 py-1 text-blue-600 hover:underline">Reassign</button>
+                          <button class="px-2 py-1 text-blue-600 hover:underline">{{ test_data }}</button>
                         </td>                      
                     </tr>
                   {% endfor %}
@@ -100,16 +100,14 @@
             </div>
           </section>
 
-          <!-- Task Tracking (Kanban) -->
-
-          
+          <!-- Task Tracking (Kanban) -->         
             <section class="bg-white rounded-xl shadow-sm">
             <div class="p-5 border-b flex justify-between items-center">
               <h2 class="font-semibold text-lg">Task Tracking</h2>
               <div class="text-sm text-slate-500">Drag & drop (coming soon)</div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
               {% for task in pro_tasks %}
                   <!-- To Do -->
                   <div class="bg-slate-50 rounded-lg p-3">
