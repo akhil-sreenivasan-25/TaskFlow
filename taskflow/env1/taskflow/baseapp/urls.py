@@ -23,5 +23,6 @@ urlpatterns = [
     path('login/',views.login_page,name="login"),
     path('tl_home/',views.tl_home,name="tl_home"),
     path('member_home/',views.member_home,name="member_home"),
-    path('',views.add_project,name="add_project")
+    path('add_project/',views.add_project,name="add_project"),
+    path('add_task/',views.add_task,name="add_task"),
 ]

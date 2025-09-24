@@ -114,6 +114,35 @@ def add_project(request):
             return HttpResponse("invalid access")
     else:
         return render(request,"log_page.html")
+    
+def add_task(request):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            t_title=request.POST.get("t_title")
+            t_desc=request.POST.get("t_desc")
+            t_due=request.POST.get("t_due")
+            t_due=datetime.strptime(t_due , '%Y-%m-%d').date()
+            t_priority=request.POST.get("t_priority")
+            t_assigned=request.POST.get("t_assigned")
+            t_project=request.POST.get("t_project")
+
+            u_id = int(request.user.id)
+            id=CustomUser.objects.get(id=u_id).empid
+            tl_emp=Employee.objects.get(empid=id) 
+            try:
+                assigned_emp=Employee.objects.get(empid=t_assigned)
+                project_obj=Project.objects.get(projectid=t_project)
+                new_task=Task(title=t_title,description=t_desc,due_date=t_due,priority=t_priority,assigned_to=assigned_emp,project=project_obj)
+                new_task.save()
+                return redirect('tl_home')
+            except Employee.DoesNotExist:
+                return HttpResponse("Assigned employee does not exist")
+            except Project.DoesNotExist:
+                return HttpResponse("Project does not exist")
+        else:
+            return HttpResponse("invalid access")
+    else:
+        return render(request,"log_page.html")
 
 def member_home(request):
     return  render(request,"member_dashboard.html")

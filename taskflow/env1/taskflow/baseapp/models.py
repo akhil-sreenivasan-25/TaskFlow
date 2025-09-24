@@ -30,7 +30,7 @@ class Project(models.Model):
     projectid=models.AutoField(primary_key=True)
     project_name=models.CharField(max_length=100)
     description=models.TextField()
-    start_date=models.DateField(null=True, blank=True)
+    start_date=models.DateField(auto_now_add=True)
     end_date=models.DateField(null=True, blank=True)
     status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='In Progress')
     team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects') # linked employee table. connect the employee whos the tl of the project
