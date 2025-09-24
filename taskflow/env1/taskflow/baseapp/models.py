@@ -30,10 +30,11 @@ class Project(models.Model):
     projectid=models.AutoField(primary_key=True)
     project_name=models.CharField(max_length=100)
     description=models.TextField()
-    start_date=models.DateField()
+    start_date=models.DateField(null=True, blank=True)
     end_date=models.DateField(null=True, blank=True)
     status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='In Progress')
-    team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects') # linked employee table. connectg the employee whos the tl of the project
+    team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects') # linked employee table. connect the employee whos the tl of the project
+    team_members=models.ManyToManyField(Employee, related_name='projects', blank=True) #linked employee table. connect the employee who are the members of the project
 
     def __str__(self):
         return self.project_name
