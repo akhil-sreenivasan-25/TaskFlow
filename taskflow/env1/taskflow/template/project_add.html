@@ -195,36 +195,37 @@
 
 
 <div id="projectModal" class="modal">
-  <form method="POST" action="{% url 'add_project' %}">
-    {% csrf_token %}
-    <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
+  
+  <div class="modal-content">
+    <span class="close" onclick="closeModalProject()">&times;</span>
     <h3>Add New Project</h3>
-    <input type="text" name="p_name" id="projectName" placeholder="Project Name" required>
-    <input type="text" name="p_desc" id="projectDscription" placeholder="Disccription" required><br>
-    <label>End Date   :</label>
-    <input type="date" name="p_end" id="projectName" placeholder="End Date">
-    <div class ='container'>
-      <div class ='select-btn-open' onclick="toggleDropdown()">
-        <span class ='btn-text'>Select Team Members</span>
-        <span class ='arrow-dwn'>
-          <i class='fa-solid fa-chevron-down'></i>
-        </span>
-      </div>
-      <ul class='list-items'>
-        {% for emp_det in emp_det %}
-          <li class='item'>        
-              <input type="checkbox" name="p_members" id="{{emp_det.empid}}" value="{{emp_det.empid}}">
-              <label for="{{emp_det.empid}}">&nbsp;{{emp_det.empid}}&nbsp;&nbsp;&nbsp;({{emp_det.name}})</label>
-          </li>
-        {% endfor %}
-      </ul>
-      
+      <form method="POST" action="{% url 'add_project' %}">
+        {% csrf_token %}
+        <input type="text" name="p_name" id="projectName" placeholder="Project Name" required>
+        <input type="text" name="p_desc" id="projectDscription" placeholder="Disccription" required><br>
+        <label>End Date   :</label>
+        <input type="date" name="p_end" id="projectdate" placeholder="End Date">
+        <div class ='container'>
+          <div class ='select-btn-open' onclick="toggleDropdown()">
+            <span class ='btn-text'>Select Team Members</span>
+            <span class ='arrow-dwn'>
+              <i class='fa-solid fa-chevron-down'></i>
+            </span>
+          </div>
+          <ul class='list-items'>
+            {% for emp_det in emp_det %}
+              <li class='item'>        
+                  <input type="checkbox" name="p_members" id="{{emp_det.empid}}" value="{{emp_det.empid}}">
+                  <label for="{{emp_det.empid}}">&nbsp;{{emp_det.empid}}&nbsp;&nbsp;&nbsp;({{emp_det.name}})</label>
+              </li>
+            {% endfor %}
+          </ul>
+          
 
+        </div>
+        <button class="button1" onclick="addProject()">Create Project</button>     
+      </form>
     </div>
-    <button class="button1" onclick="addProject()">Create Project</button>
-    </div>
-  </form>
 </div>
 
 <script>
@@ -236,7 +237,7 @@
     document.getElementById("projectModal").style.display = "block";
   }
 
-  function closeModal() {
+  function closeModalProject() {
     document.getElementById("projectModal").style.display = "none";
   }
 

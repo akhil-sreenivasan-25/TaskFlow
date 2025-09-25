@@ -115,41 +115,47 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
               {% for task in pro_tasks %}
                   <!-- To Do -->
-                  <div class="bg-slate-50 rounded-lg p-3">
-                    <h3 class="font-medium mb-3">To Do</h3>
-                    <div class="space-y-3">
-                      {% if task.status == 'pending' %}
+                  {% if task.status == 'pending' %}
+                    <div class="bg-slate-50 rounded-lg p-3">
+                      <h3 class="font-medium mb-3">To Do</h3>
+                      <div class="space-y-3">
+                        <!-- {% if task.status == 'pending' %} -->
+                          <div class="p-3 bg-white rounded-md border">
+                            <p class="font-medium">{{ task.title }}</p>
+                            <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                          </div>
+                        <!-- {% endif %} -->
+                      </div>
+                    </div>
+                  {% endif %}
+                    <!-- In Progress -->
+                  {% if task.status == 'in_progress' %}
+                    <div class="bg-slate-50 rounded-lg p-3">
+                      <h3 class="font-medium mb-3">In Progress</h3>
+                      <div class="space-y-3">
+                        
                         <div class="p-3 bg-white rounded-md border">
                           <p class="font-medium">{{ task.title }}</p>
                           <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
                         </div>
-                      {% endif %}
+                        
+                      </div>
                     </div>
-                  </div>
-                  <!-- In Progress -->
-                  <div class="bg-slate-50 rounded-lg p-3">
-                    <h3 class="font-medium mb-3">In Progress</h3>
-                    <div class="space-y-3">
-                      {% if task.status == 'in_progress' %}
-                        <div class="p-3 bg-white rounded-md border">
-                          <p class="font-medium">{{ task.title }}</p>
-                          <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
+                  {% endif %}
                   <!-- Completed -->
-                  <div class="bg-slate-50 rounded-lg p-3">
-                    <h3 class="font-medium mb-3">Completed</h3>
-                    <div class="space-y-3">
-                      {% if task.status == 'completed' %}
-                        <div class="p-3 bg-white rounded-md border">
-                          <p class="font-medium">{{ task.title }}</p>
-                          <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
-                        </div>
-                      {% endif %}
+                  {% if task.status == 'completed' %}
+                    <div class="bg-slate-50 rounded-lg p-3">
+                      <h3 class="font-medium mb-3">Completed</h3>
+                      <div class="space-y-3">
+                        <!-- {% if task.status == 'completed' %} -->
+                          <div class="p-3 bg-white rounded-md border">
+                            <p class="font-medium">{{ task.title }}</p>
+                            <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                          </div>
+                        <!-- {% endif %} -->
+                      </div>
                     </div>
-                  </div>
+                  {% endif %}
               {% endfor %}
               
             </div>

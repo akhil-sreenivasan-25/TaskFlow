@@ -25,4 +25,5 @@ urlpatterns = [
     path('member_home/',views.member_home,name="member_home"),
     path('add_project/',views.add_project,name="add_project"),
     path('add_task/',views.add_task,name="add_task"),
+    path('team_member/<int:projectid>/', views.team_member, name='team_member')
 ]

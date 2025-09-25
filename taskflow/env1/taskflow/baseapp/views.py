@@ -1,5 +1,6 @@
 from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth import authenticate,login,logout
+from django.http import JsonResponse
 from .models import CustomUser,Employee,Project,Task
 from datetime import date,timedelta
 from datetime import datetime
@@ -65,7 +66,7 @@ def tl_home(request):
          #member_task_count=Task
 
          #task tracking
-         tl_all_tasks=Task.objects.filter(project__in=tl_projects).values('title','due_date','priority','status')
+         tl_all_tasks=Task.objects.filter(project__in=tl_projects).values('title','due_date','priority','status').order_by('due_date')
 
          #project progress
          tl_projects=emp_obj.led_projects.exclude(status='completed').values_list('projectid', flat=True)
@@ -78,8 +79,11 @@ def tl_home(request):
          #employee details for add new project
          tot_emp=Employee.objects.exclude(Q(empid=emp_obj.empid) | Q(is_active=False))
 
+        #project details for add new task
+         tl_projects_det=emp_obj.led_projects.exclude(status='completed').values('projectid','project_name')
+
          task_det=0
-         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":emp_obj.empid,"emp_det":tot_emp})
+         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_projects,"emp_det":tot_emp,"pro_details":tl_projects_det})
     else:
         return  HttpResponse("invalid user")
     
@@ -143,6 +147,19 @@ def add_task(request):
             return HttpResponse("invalid access")
     else:
         return render(request,"log_page.html")
+    
+
+#for collect the employee details of the specific project    
+def team_member(request,projectid):
+    if request.method=="GET" :
+        if request.user.is_authenticated :
+            projects_id=Project.objects.get(projectid=projectid)
+            employees = projects_id.team_members.all()
+            data = [{'id': emp.empid, 'name': emp.name} for emp in employees]
+            return JsonResponse(data, safe=False)
+        else :
+            return render(request,"log_page.html")
+
 
 def member_home(request):
     return  render(request,"member_dashboard.html")
