@@ -36,11 +36,11 @@
           <!-- pop window included -->
           {% include 'project_add.html' %} 
           {% include 'task_add.html' %}
+          {% include 'logout_session.html'%}
           <!-- pop window included end -->
           <button onclick="openModalProject()" class="hidden md:inline-flex px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" >+ New Project</button>
           <button onclick="openModalTask()" class="px-3 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">+ New Task</button>
-          <div class="w-9 h-9 rounded-full bg-blue-500 ring-2 ring-blue-200 flex items-center justify-center text-white font-semibold"> AK</div>
-          
+          <button id="profileId" onclick="toggleProfileMenu()" class="w-9 h-9 rounded-full bg-blue-500 ring-2 ring-blue-200 flex items-center justify-center text-white font-semibold"> AK</button>
         </div>
       </header>
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth import authenticate,login,logout
+from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from .models import CustomUser,Employee,Project,Task
 from datetime import date,timedelta
@@ -31,8 +32,23 @@ def login_page(request):
     else:
         return render(request,"log_page.html")
     
+def logout_page(request):
+    if request.method=="POST":
+        if request.user.is_authenticated:
+            logout(request)
+            response = redirect('login')
+            response.delete_cookie('sessionid')  # Optional: depends on your setup
+            response['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            return response
+        else:
+            return HttpResponse("invalid user")
+    else:
+        return HttpResponse("invalid access")
     
-
+    
+@never_cache
 def tl_home(request):
     if request.user.is_authenticated:
          u_id = int(request.user.id)
@@ -83,7 +99,7 @@ def tl_home(request):
          tl_projects_det=emp_obj.led_projects.exclude(status='completed').values('projectid','project_name')
 
          task_det=0
-         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_projects,"emp_det":tot_emp,"pro_details":tl_projects_det})
+         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_projects,"emp_det":tot_emp,"emp_obj":emp_obj,"pro_details":tl_projects_det})
     else:
         return  HttpResponse("invalid user")
     
@@ -122,13 +138,13 @@ def add_project(request):
 def add_task(request):
     if request.user.is_authenticated:
         if request.method=="POST":
-            t_title=request.POST.get("t_title")
+            t_title=request.POST.get("t_name")
             t_desc=request.POST.get("t_desc")
-            t_due=request.POST.get("t_due")
+            t_due=request.POST.get("t_end")
             t_due=datetime.strptime(t_due , '%Y-%m-%d').date()
             t_priority=request.POST.get("t_priority")
-            t_assigned=request.POST.get("t_assigned")
-            t_project=request.POST.get("t_project")
+            t_assigned=request.POST.get("assign_to")
+            t_project=request.POST.get("p_id")
 
             u_id = int(request.user.id)
             id=CustomUser.objects.get(id=u_id).empid

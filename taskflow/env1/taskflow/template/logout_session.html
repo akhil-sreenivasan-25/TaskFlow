@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Dashboard Sidebar</title>
+    <style>
+      /* body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        display: flex;
+      } */
+
+      .profile-dropdown {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        width: 260px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        font-family: 'Segoe UI', sans-serif;
+        z-index: 1000;
+      }
+
+      .profile-header {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+
+      .user-info {
+        flex-grow: 1;
+      }
+
+      .user-name {
+        font-weight: 600;
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .user-email {
+        font-size: 12px;
+        color: #666;
+        margin: 2px 0 0;
+      }
+
+      .profile-divider {
+        height: 1px;
+        background-color: #e0e0e0;
+      }
+
+      .profile-actions {
+        padding: 12px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .logout-btn {
+        width: 100%;
+        padding: 8px;
+        background-color: #1273d3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .logout-btn:hover {
+        background-color: #0b0404;
+      }
+
+
+    .profile-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .profile-dropdown.hidden {
+      display: none;
+    }
+    </style>
+  </head>
+  <body>
+
+  <!-- Profile Icon -->
+    <div id="empMenu" class="profile-container">
+      <div id="empprofileMenu" class="profile-dropdown hidden">
+        <div class="profile-header">
+          <div class="w-9 h-9 rounded-full bg-blue-500 ring-2 ring-blue-200 flex items-center justify-center text-white font-semibold"> AK</div>&nbsp;&nbsp;&nbsp;
+          <div class="user-info">
+            <p class="user-name">{{ emp_obj.name }}</p>
+            <p class="user-email">{{ emp_obj.email }}</p>
+          </div>
+        </div>
+        <div class="profile-divider"></div>
+        <div class="profile-actions">
+          <!-- <p class="user-name">&nbsp;&nbsp;&nbsp; {{ emp_obj.name }}  </p> -->
+          <p class="user-name">&nbsp;&nbsp;&nbsp; ID&nbsp;:&nbsp;{{ emp_obj.empid }}</p>
+          <p class="user-name">&nbsp;&nbsp;&nbsp; {{ emp_obj.role }}</p>
+          <form action="{% url 'logout' %}" method="POST" style="margin-top: 10px;">
+            {% csrf_token %}  
+            <button class="logout-btn">Logout</button>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+    <script>
+      function toggleProfileMenu() {
+        const menu = document.getElementById("empprofileMenu");
+        if (menu.classList.contains("hidden")) {
+          menu.classList.remove("hidden");
+          count=1;
+        } else {
+          menu.classList.add("hidden");
+        }
+      }
+      function toggleDropdown() {
+        document.querySelector(".profile-dropdown").classList.toggle("hidden");
+      }
+
+      const myDiv = document.getElementById("empprofileMenu");
+      document.addEventListener("click", function(event) {
+        if(!myDiv.contains(event.target) && count == 2 ){
+          myDiv.classList.add("hidden");
+        }
+        if (!myDiv.contains(event.target) && count <= 1) {
+          count=count+1;
+        }
+      });
+    </script>
+  </body>
+</html>
