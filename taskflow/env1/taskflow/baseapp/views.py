@@ -9,7 +9,7 @@ from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatFie
 
 # Create your views here.
 def test(request):
-    return render(request,"member_dashboard.html")
+    return render(request,"project_tab.html")
 
 #user authentication and login
 def login_page(request):
@@ -178,4 +178,7 @@ def team_member(request,projectid):
 
 
 def member_home(request):
-    return  render(request,"member_dashboard.html")
+    if request.user.is_authenticated:
+        return  render(request,"project_det.html")
+    else:
+        return HttpResponse("invalid user")
