@@ -1,15 +1,15 @@
-from django.shortcuts import render,HttpResponse,redirect
+from django.shortcuts import render,HttpResponse,redirect,HttpResponseRedirect
 from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
-from .models import CustomUser,Employee,Project,Task
+from .models import CustomUser,Employee,Project,Task,client
 from datetime import date,timedelta
 from datetime import datetime
 from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q
 
 # Create your views here.
 def test(request):
-    return render(request,"project_tab.html")
+    return HttpResponse("test page")
 
 #user authentication and login
 def login_page(request):
@@ -110,6 +110,8 @@ def add_project(request):
             p_desc=request.POST.get("p_desc")
             p_end=request.POST.get("p_end")
             p_end=datetime.strptime(p_end , '%Y-%m-%d').date()
+            client_id=request.POST.get("client")
+            client_obj=client.objects.get(clientid=client_id)            
             #p_end = datetime.strptime(p_end, '%d-%m-%Y').strftime('%Y-%m-%d')
 
             p_members=request.POST.getlist("p_members") # Get list of selected team members
@@ -117,7 +119,7 @@ def add_project(request):
             u_id = int(request.user.id)
             id=CustomUser.objects.get(id=u_id).empid
             tl_emp=Employee.objects.get(empid=id) 
-            new_project=Project(project_name=p_name,description=p_desc,end_date=p_end,team_lead=tl_emp)
+            new_project=Project(project_name=p_name,description=p_desc,end_date=p_end,team_lead=tl_emp,client_details=client_obj)
             new_project.save()
 
             # Add selected team members to the project
@@ -132,6 +134,32 @@ def add_project(request):
             return redirect('tl_home')
         else:
             return HttpResponse("invalid access")
+    else:
+        return render(request,"log_page.html")
+    
+def project_edit(request):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            project_id=request.POST.get("p_id")
+            p_name=request.POST.get("p_name")
+            p_desc=request.POST.get("p_desc")
+            p_members=request.POST.getlist("p_members") # Get list of selected team members
+            project_id=Project.objects.get(projectid=project_id)
+            project_id.project_name=p_name
+            project_id.description=p_desc
+            project_id.save()
+            if p_members:
+                for member_id in p_members:
+                    try:
+                        member_emp = Employee.objects.get(empid=member_id)
+                        project_id.team_members.add(member_emp)
+                    except Employee.DoesNotExist:
+                        continue  # Skip if the employee does not exist
+            return HttpResponse("done")
+            # return redirect('project_detailed_view',projectid=project_id.projectid)
+        else:
+            return HttpResponse("invalid access")
+        
     else:
         return render(request,"log_page.html")
     
@@ -176,9 +204,52 @@ def team_member(request,projectid):
         else :
             return render(request,"log_page.html")
 
-
-def member_home(request):
+def client_det(request):
     if request.user.is_authenticated:
-        return  render(request,"project_det.html")
+        clients=client.objects.filter(is_active=True)
+        data = [{'id': client.clientid, 'company': client.company_name} for client in clients]
+        return JsonResponse(data, safe=False)
+        
+    else:
+        return HttpResponse("invalid user")
+
+def project_home(request):
+    if request.user.is_authenticated:
+        u_id = int(request.user.id)
+        id=CustomUser.objects.get(id=u_id).empid
+        emp_obj=Employee.objects.get(empid=id)
+        if(emp_obj.led_projects.count()==0):
+            alert="No projects assigned"
+        else:
+            project_obj=Project.objects.filter(team_lead=emp_obj).order_by('end_date').select_related('client_details')
+            count_obj=project_obj.annotate(t_count=Count('tasks')).annotate(pending_count=Count('tasks', filter=Q(tasks__status='completed')))
+            return  render(request,"project_det.html",{"pro_det":count_obj})
+    else:
+        return HttpResponse("invalid user")
+    
+    
+def project_detailed_view(request,projectid):
+    if request.user.is_authenticated:
+        project_det=Project.objects.get(projectid=projectid)
+        client_det=project_det.client_details
+        tasks_det=Task.objects.filter(project=projectid).select_related('assigned_to').order_by('-status')
+        team_member_id=list(project_det.team_members.values_list('empid', flat=True))
+        tot_emp=Employee.objects.exclude(Q(empid=request.user.id) | Q(empid__in=team_member_id ) | Q(is_active=False))
+
+        HttpResponse("project id is "+str(tasks_det))
+        
+        return render(request,"project_detailed_view.html",{"project":project_det,"client":client_det,"tasks":tasks_det,"emp_det":tot_emp})
+    else:
+        return HttpResponse("invalid user")
+    
+def project_edit_view(request,projectid):
+    if request.user.is_authenticated:
+        u_id = int(request.user.id)
+        id=CustomUser.objects.get(id=u_id).empid
+        project_det=Project.objects.get(projectid=projectid)
+        team_member_id=list(project_det.team_members.values_list('empid', flat=True))
+        tot_emp=Employee.objects.exclude(Q(empid=id) | Q(empid__in=team_member_id ) | Q(is_active=False)).values('empid','name')
+        # data=tot_emp.values_list('empid','name')
+        return JsonResponse(list(tot_emp),safe=False)
     else:
         return HttpResponse("invalid user")

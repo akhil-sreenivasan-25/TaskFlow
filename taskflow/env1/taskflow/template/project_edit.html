@@ -116,8 +116,8 @@
       -webkit-animation-fill-mode: both;
       overflow-y: auto;         /* Enable vertical scroll */
       max-height: 200px;        /* Limit height, adjust as needed */
-
     } 
+
     .list-items .item{
       display: flex;
       align-items: center;
@@ -195,83 +195,104 @@
 </head>
 <body>
 
+<iframe name="hiddenFrame" style="display:none;"></iframe>
 
-<div id="projectModal" class="modal">
+<div id="projectModalEdit" class="modal">
   
   <div class="modal-content">
-    <span class="close" onclick="closeModalProjectadd()">&times;</span>
+    <span class="close" onclick="closeModalProject()">&times;</span>
     <h3>Add New Project</h3>
-      <form method="POST" action="{% url 'add_project' %}">
+      <form method="POST" action="{% url 'edit_project' %}" target="hiddenFrame" onsubmit="return handleSubmit();">
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-          <input type="text" name="p_name" id="projectName" placeholder="Project Name" required>
-          <textarea id="description" name="p_desc" rows="4" placeholder="Enter details here..."></textarea>
+          <input type="hidden" name="p_id" id="projectIdEdit" >
+          <label>Project name :</label>
+          <input type="text" name="p_name" id="projectNameEdit" required>
+          <label>Discription :</label>
+          <textarea id="descriptionEdit" name="p_desc" rows="4" placeholder='Add content...' ></textarea>
           <!-- <input type="text" name="p_desc" id="projectDscription" placeholder="Disccription" required><br> -->
-          <label>Client</label>
-          <select name="client" id="client" required>
-            <option value="">--Select Employee--</option>
-          </select>
-          <label>End Date   :</label>
-          <input type="date" name="p_end" id="projectdate" placeholder="End Date">
+          <!-- <label>End Date   :</label>
+          <input type="date" name="p_end" id="projectdate" placeholder="End Date" value="{{ project.end_date }}" required><br> -->
           
         </div>
-        <div class ='container'>
-          <div class ='select-btn-open' onclick="toggleDropdownemp()">
-            <span class ='btn-text'>Select Team Members</span>
-            <span class ='arrow-dwn'>
-              <i class='fa-solid fa-chevron-down'></i>
+
+
+        <div class="container">
+          <div class="select-btn-open" onclick="toggleDropdownempedit(this)">
+            <span class="btn-text">Select Team Members</span>
+            <span class="arrow-dwn">
+              <i class="fa-solid fa-chevron-down"></i>
             </span>
           </div>
-          <ul class='list-items'>
-            {% for emp_det in emp_det %}
-              <li class='item'>        
-                  <input type="checkbox" name="p_members" id="{{emp_det.empid}}" value="{{emp_det.empid}}">
-                  <label for="{{emp_det.empid}}">&nbsp;{{emp_det.empid}}&nbsp;&nbsp;&nbsp;({{emp_det.name}})</label>
-              </li>
-            {% endfor %}
+
+          <!-- This UL must be directly under .container -->
+          <ul id="checkbox-container" class="list-items">
+            <!-- JavaScript will inject <li> items here -->
           </ul>
         </div>
-        <button class="button1">Create Project</button>     
+        <button class="button1">Submit</button>     
       </form>
     </div>
 </div>
 
 <script>
 
-  function toggleDropdownemp() {
-    const container = document.querySelector('.container');
+  function toggleDropdownempedit(button) {
+    const container = button.closest('.container');
     container.classList.toggle('open');
+
   }
-  function openModalProject() {
-    document.getElementById("projectModal").style.display = "block";
-    // for fetching client details
-    fetch(`/client_det/`)
+  function openModalEditProject(projectId,projectName,projectDescription) {
+    // alert("project id is"+projectId+"project name is"+projectName+"project discription is"+projectDescription);
+    document.getElementById("projectModalEdit").style.display = "block";
+    document.getElementById("projectNameEdit").value =projectName;
+    document.getElementById("projectIdEdit").value =projectId;
+    document.getElementById("descriptionEdit").value =projectDescription;
+    fetch(`/project_edit/${projectId}/`)
       .then(response => response.json())
-      .then(data => {
-        const clientSelect = document.getElementById('client');
-        clientSelect.innerHTML = '<option value="">--Select Client--</option>';
-        if (data.length === 0) {
-          // Add a disabled option to indicate no clients
-          const option = document.createElement('option');
-          option.value = "";
-          option.textContent = "No clients available";
-          option.disabled = true;
-          clientSelect.appendChild(option);
-        }
-        else {
-          data.forEach(client => {
-            const option = document.createElement('option');
-            option.value = client.id;
-            option.textContent = `(${client.id})  ${client.company}`;
-            clientSelect.appendChild(option);
-          });
-        }
-      })
-      .catch(error => console.error('Fetch error:', error));
+      .then(data =>{
+        
+        const container = document.getElementById('checkbox-container'); // Target UL or DIV
+        container.innerHTML = '';
+        data.forEach(emp_det => {
+        const li = document.createElement('li');
+        li.className = 'item';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'p_members';
+        checkbox.id = emp_det.empid;
+        checkbox.value = emp_det.empid;
+
+        const label = document.createElement('label');
+        label.htmlFor = emp_det.empid;
+        label.innerHTML = `&nbsp;${emp_det.empid}&nbsp;&nbsp;&nbsp;(${emp_det.name})`;
+
+        li.appendChild(checkbox);
+        li.appendChild(label);
+        container.appendChild(li);
+      });
+    })
+    .catch(error => console.error('Error loading checklist:', error));
+  }  
+  
+    
+  function handleSubmit() {
+    setTimeout(function() {
+      projectid=document.getElementById("projectIdEdit").value;
+      alert("Done");
+      closeModalProject()
+      proDetailView(projectid)
+
+    }, 500); // slight delay to allow server to respond
+    return true;
   }
 
-  function closeModalProjectadd() {
-    document.getElementById("projectModal").style.display = "none";
+
+
+
+  function closeModalProject() {
+    document.getElementById("projectModalEdit").style.display = "none";
   }
 
   function addProject() {

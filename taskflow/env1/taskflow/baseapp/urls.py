@@ -23,8 +23,12 @@ urlpatterns = [
     path('login/',views.login_page,name="login"),
     path('logout/',views.logout_page,name="logout"),
     path('tl_home/',views.tl_home,name="tl_home"),
-    path('member_home/',views.member_home,name="member_home"),
+    path('project_home/',views.project_home,name="project_home"),
     path('add_project/',views.add_project,name="add_project"),
     path('add_task/',views.add_task,name="add_task"),
-    path('team_member/<int:projectid>/', views.team_member, name='team_member')
+    path('team_member/<int:projectid>/', views.team_member, name='team_member'),
+    path('client_det/', views.client_det, name='client_det'),
+    path('project_detailed_view/<int:projectid>/', views.project_detailed_view, name='project_detailed_view'),
+    path('edit_project/', views.project_edit, name="edit_project"),
+    path('project_edit/<int:projectid>/', views.project_edit_view, name='project_edit_view')
 ]

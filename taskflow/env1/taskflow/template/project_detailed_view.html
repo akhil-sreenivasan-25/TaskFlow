@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow – TL Project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="p-6 bg-gray-100 min-h-screen">
+      <!-- Project Metadata -->
+      <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-2">{{project.project_name}}</h2>
+        <p class="text-sm text-gray-600 mb-4">Client:&nbsp;{{ client.company_name }}&nbsp;|&nbsp;Status:&nbsp;{{project.status}}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <h3 class="font-semibold mb-1">Project Details</h3>
+            <ul class="list-disc ml-5">
+              <li>Start Date:&nbsp;{{project.start_date}}</li>
+              <li>Deadline:&nbsp;{{project.end_date}}</li>
+              <li>Tech Stack: Django, PostgreSQL, Tailwind, JS</li>
+              <li>Auth: Hashed passwords, session checks</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-1">Client Details</h3>
+            <ul>
+              <li>Client: {{client.company_name}} </li>
+              <li>Represent : {{client.client_name}}</li>
+              <li>Mail: {{client.contact_email}}</li>
+              <li>Contact: {{client.contact_phone}}</li>
+            </ul>
+          </div>
+          <!-- <div>
+            <h3 class="font-semibold mb-1">Admin Features</h3>
+            <ul class="list-disc ml-5">
+              <li>Inline editing, fieldsets</li>
+              <li>AJAX workflows</li>
+              <li>Responsive UI</li>
+              <li>Documentation: In Progress</li>
+            </ul>
+          </div> -->
+        </div>
+      </div>
+
+      <div id="projectDetailView" class="bg-white shadow-md rounded-lg p-6">
+        {% include 'project_edit.html' %}
+        <h3 class="text-xl font-bold mb-4">Project requirement</h3>
+        <p>{{project.description}}</p>
+        <div class="flex justify-end mt-4">
+        
+
+        <button type="submit" onclick="openModalEditProject('{{project.projectid}}','{{project.project_name}}','{{project.description}}')" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+          Edit
+        </button>
+      </div>
+
+      </div>
+
+      <!-- Team Member Task Table -->
+      <div class="bg-white shadow-md rounded-lg p-6">
+        <h3 class="text-xl font-bold mb-4">Tasks</h3>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm text-left border">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="px-4 py-2">Task ID</th>
+                <th class="px-4 py-2">Member</th>
+                <th class="px-4 py-2">Role</th>
+                <th class="px-4 py-2">Task</th>
+                <th class="px-4 py-2">Status</th>
+                <th class="px-4 py-2">Priority</th>
+                <th class="px-4 py-2">Due Date</th>
+                <th class="px-4 py-2">Tags</th>
+                <th class="px-4 py-2">Access</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Example Row -->
+              {% for tasks in tasks %}
+                <tr class="border-t">
+                  <td class="px-4 py-2 font-medium">{{tasks.taskid}}</td>
+                  <td class="px-4 py-2 font-medium">{{tasks.assigned_to.name}}</td>
+                  <td class="px-4 py-2">{{tasks.assigned_to.role}}</td>
+                  <td class="px-4 py-2">{{tasks.title}}</td>
+                  <td class="px-4 py-2 text-green-600">{{tasks.status}}</td>
+                  <td class="px-4 py-2">{{tasks.priority}}</td>
+                  <td class="px-4 py-2">{{tasks.due_date}}</td>
+                  <td class="px-4 py-2">backend, auth, admin</td>
+                  <td class="px-4 py-2 text-blue-600 font-semibold">Full Access</td>
+                </tr>
+              {% endfor %}
+              <!-- Repeat for other members -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comment Section -->
+    <div class="bg-white shadow-md rounded-lg p-6 mt-8">
+      <h3 class="text-xl font-bold mb-4">Comments & Attachments</h3>
+      
+      <!-- Comment Form -->
+      <form method="POST" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <div>
+          <label for="comment" class="block text-sm font-medium text-gray-700">Your Comment</label>
+          <textarea id="comment" name="comment" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+
+        <div>
+          <label for="attachment" class="block text-sm font-medium text-gray-700">Attach Document</label>
+          <input type="file" id="attachment" name="attachment" class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+        </div>
+
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+          Submit
+        </button>
+      </form>
+
+      <!-- Display Comments -->
+      <div class="mt-6 space-y-4">
+        {% for comment in comments %}
+          <div class="border-t pt-4">
+            <p class="text-sm text-gray-800"><strong>{{ comment.user.username }}</strong> said:</p>
+            <p class="text-sm text-gray-600">{{ comment.text }}</p>
+            {% if comment.attachment %}
+              <p class="text-sm mt-1">
+                📎 <a href="{{ comment.attachment.url }}" class="text-blue-600 hover:underline">Download Attachment</a>
+              </p>
+            {% endif %}
+            <p class="text-xs text-gray-400">{{ comment.created_at }}</p>
+          </div>
+        {% empty %}
+          <p class="text-sm text-gray-500">No comments yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+  </body>
+
+  <script>
+    
+    
+      // Redirect to the project edit page
+    function proEditView(projectId) {
+      fetch(`/project_edit_view/${projectId}/`)
+        .then(response => response.text())
+        .then(html => {
+          const modalContainer = document.createElement('div');
+          modalContainer.innerHTML = html;
+          document.body.appendChild(modalContainer);
+          document.getElementById("projectModalEdit").style.display = "block";
+
+          // document.getElementById('editProjectContent').innerHTML = html;
+          // document.getElementById('editProjectModal').classList.remove('hidden');
+        })
+        .catch(error => console.error('Error loading edit form:', error));
+    }
+      
+    // Optional: Close modal when clicking outside
+    document.getElementById('editProjectModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.add('hidden');
+      }
+    });
+    
+  </script>
+  
+</html>

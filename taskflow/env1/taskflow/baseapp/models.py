@@ -23,7 +23,20 @@ class Employee(models.Model):
     def __str__(self):
         return self.name
     
+class client(models.Model):
+    clientid=models.AutoField(primary_key=True)
+    client_name=models.CharField(max_length=100)
+    contact_email=models.EmailField(unique=True)
+    contact_phone=models.CharField(max_length=15, null=True, blank=True)
+    company_name=models.CharField(max_length=100, null=True, blank=True)
+    address=models.TextField(null=True, blank=True)
+    country=models.CharField(max_length=50, null=True, blank=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    is_active=models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.client_name
     
 #project details
 class Project(models.Model):
@@ -35,6 +48,7 @@ class Project(models.Model):
     status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')], default='In Progress')
     team_lead=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='led_projects') # linked employee table. connect the employee whos the tl of the project
     team_members=models.ManyToManyField(Employee, related_name='projects', blank=True) #linked employee table. connect the employee who are the members of the project
+    client_details=models.ForeignKey(client, on_delete=models.CASCADE, related_name='client_det', blank=True, null=True) #linked client table. connect the client details of the project
 
     def __str__(self):
         return self.project_name

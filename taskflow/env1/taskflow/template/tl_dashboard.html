@@ -19,7 +19,7 @@
         <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800" href="{% url 'tl_home' %}">
           <span>🏠</span><span>Dashboard</span>
         </a>
-        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="{% url 'test' %}">📁 Projects</a>
+        <a id="projectId" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📁 Projects</a>
         <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">✅ Tasks</a>
         <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📊 Reports</a>
         <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">⚙️ Settings</a>
@@ -31,12 +31,16 @@
     <main class="flex-1 p-6 md:p-8">
       <!-- Header -->
       <header class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold">Dashboard</h1>
+        <div id="mainHead" class="text-2xl md:text-3xl font-bold">
+          <h1 >Dashboard</h1>
+        </div>
+        <!-- <h1 class="text-2xl md:text-3xl font-bold">Dashboard</h1> -->
         <div class="flex items-center gap-3">
           <!-- pop window included -->
           {% include 'project_add.html' %} 
           {% include 'task_add.html' %}
           {% include 'logout_session.html'%}
+          {% include 'project_edit.html' %}
           <!-- pop window included end -->
           <button onclick="openModalProject()" class="hidden md:inline-flex px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" >+ New Project</button>
           <button onclick="openModalTask()" class="px-3 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">+ New Task</button>
@@ -44,212 +48,244 @@
         </div>
       </header>
 
-      <!-- KPI cards -->
-       <!-- count session -->
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white rounded-xl shadow-sm p-5">
-          <p class="text-slate-500 text-sm">Total Projects</p>
-          <p class="text-3xl font-semibold">{{count.p_count}}</p>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm p-5">
-          <p class="text-slate-500 text-sm">Active Tasks</p>
-          <p class="text-3xl font-semibold text-emerald-600">{{count.t_count}}</p>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm p-5">
-          <p class="text-slate-500 text-sm">Upcoming Deadlines</p>
-          <p class="text-3xl font-semibold text-amber-600">{{count.dl_count}}</p>
-        </div>
-      </section>
+      <div id="project_det_view">
+        <!-- KPI cards -->
+        <!-- count session -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-xl shadow-sm p-5">
+            <p class="text-slate-500 text-sm">Total Projects</p>
+            <p class="text-3xl font-semibold">{{count.p_count}}</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5">
+            <p class="text-slate-500 text-sm">Active Tasks</p>
+            <p class="text-3xl font-semibold text-emerald-600">{{count.t_count}}</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5">
+            <p class="text-slate-500 text-sm">Upcoming Deadlines</p>
+            <p class="text-3xl font-semibold text-amber-600">{{count.dl_count}}</p>
+          </div>
+        </section>
 
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <!-- Left column -->
-        <div class="xl:col-span-2 space-y-6">
-          <!-- Team Management -->
-          <section class="bg-white rounded-xl shadow-sm">
-            <div class="p-5 border-b">
-              <h2 class="font-semibold text-lg">Team Management</h2>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full text-sm">
-                <thead class="bg-slate-50">
-                  <tr class="text-left text-slate-600">
-                    <th class="px-5 py-3">Name</th>
-                    <th class="px-5 py-3">Role</th>
-                    <th class="px-5 py-3">Status</th>
-                    <th class="px-5 py-3">Tasks Assigned</th>
-                    <th class="px-5 py-3 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for emp in emp_manage %}
-                    <tr class="border-t">
-                        <td class="px-5 py-3">{{emp.name}}</td>
-                        <td class="px-5 py-3">{{emp.role}}</td>
-                        <td class="px-5 py-3">
-                          <span class="text-emerald-600 font-medium">
-                            {% if emp.is_active  %}
-                              Active
-                            {% else %}
-                              Idle
-                            {% endif %}                          
-                          </span>
-                        </td>
-                        <td class="px-5 py-3">{{emp.member_task_count}}</td>
-                        <td class="px-5 py-3 text-center">
-                          <button class="px-2 py-1 text-blue-600 hover:underline">{{ test_data }}</button>
-                        </td>                      
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </section>
+        <div id="swapTab">
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <!-- Left column -->
+            <div  class="xl:col-span-2 space-y-6">
+              <!-- Team Management -->
+              <section class="bg-white rounded-xl shadow-sm">
+                <div class="p-5 border-b">
+                  <h2 class="font-semibold text-lg">Team Management</h2>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full text-sm">
+                    <thead class="bg-slate-50">
+                      <tr class="text-left text-slate-600">
+                        <th class="px-5 py-3">Name</th>
+                        <th class="px-5 py-3">Role</th>
+                        <th class="px-5 py-3">Status</th>
+                        <th class="px-5 py-3">Tasks Assigned</th>
+                        <th class="px-5 py-3 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for emp in emp_manage %}
+                        <tr class="border-t">
+                            <td class="px-5 py-3">{{emp.name}}</td>
+                            <td class="px-5 py-3">{{emp.role}}</td>
+                            <td class="px-5 py-3">
+                              <span class="text-emerald-600 font-medium">
+                                {% if emp.is_active  %}
+                                  Active
+                                {% else %}
+                                  Idle
+                                {% endif %}                          
+                              </span>
+                            </td>
+                            <td class="px-5 py-3">{{emp.member_task_count}}</td>
+                            <td class="px-5 py-3 text-center">
+                              <button class="px-2 py-1 text-blue-600 hover:underline">{{ test_data }}</button>
+                            </td>                      
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
 
-          <!-- Task Tracking (Kanban) -->         
-            <section class="bg-white rounded-xl shadow-sm">
-            <div class="p-5 border-b flex justify-between items-center">
-              <h2 class="font-semibold text-lg">Task Tracking</h2>
-              <div class="text-sm text-slate-500">Drag & drop (coming soon)</div>
-            </div>
+              <!-- Task Tracking (Kanban) -->         
+                <section class="bg-white rounded-xl shadow-sm">
+                <div class="p-5 border-b flex justify-between items-center">
+                  <h2 class="font-semibold text-lg">Task Tracking</h2>
+                  <div class="text-sm text-slate-500">Drag & drop (coming soon)</div>
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
-              {% for task in pro_tasks %}
-                  <!-- To Do -->
-                  {% if task.status == 'pending' %}
-                    <div class="bg-slate-50 rounded-lg p-3">
-                      <h3 class="font-medium mb-3">To Do</h3>
-                      <div class="space-y-3">
-                        <!-- {% if task.status == 'pending' %} -->
-                          <div class="p-3 bg-white rounded-md border">
-                            <p class="font-medium">{{ task.title }}</p>
-                            <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+                  {% for task in pro_tasks %}
+                      <!-- To Do -->
+                      {% if task.status == 'pending' %}
+                        <div class="bg-slate-50 rounded-lg p-3">
+                          <h3 class="font-medium mb-3">To Do</h3>
+                          <div class="space-y-3">
+                            <!-- {% if task.status == 'pending' %} -->
+                              <div class="p-3 bg-white rounded-md border">
+                                <p class="font-medium">{{ task.title }}</p>
+                                <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                              </div>
+                            <!-- {% endif %} -->
                           </div>
-                        <!-- {% endif %} -->
-                      </div>
-                    </div>
-                  {% endif %}
-                    <!-- In Progress -->
-                  {% if task.status == 'in_progress' %}
-                    <div class="bg-slate-50 rounded-lg p-3">
-                      <h3 class="font-medium mb-3">In Progress</h3>
-                      <div class="space-y-3">
-                        
-                        <div class="p-3 bg-white rounded-md border">
-                          <p class="font-medium">{{ task.title }}</p>
-                          <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
                         </div>
-                        
-                      </div>
-                    </div>
-                  {% endif %}
-                  <!-- Completed -->
-                  {% if task.status == 'completed' %}
-                    <div class="bg-slate-50 rounded-lg p-3">
-                      <h3 class="font-medium mb-3">Completed</h3>
-                      <div class="space-y-3">
-                        <!-- {% if task.status == 'completed' %} -->
-                          <div class="p-3 bg-white rounded-md border">
-                            <p class="font-medium">{{ task.title }}</p>
-                            <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                      {% endif %}
+                        <!-- In Progress -->
+                      {% if task.status == 'in_progress' %}
+                        <div class="bg-slate-50 rounded-lg p-3">
+                          <h3 class="font-medium mb-3">In Progress</h3>
+                          <div class="space-y-3">
+                            
+                            <div class="p-3 bg-white rounded-md border">
+                              <p class="font-medium">{{ task.title }}</p>
+                              <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                            </div>
+                            
                           </div>
-                        <!-- {% endif %} -->
-                      </div>
-                    </div>
-                  {% endif %}
-              {% endfor %}
+                        </div>
+                      {% endif %}
+                      <!-- Completed -->
+                      {% if task.status == 'completed' %}
+                        <div class="bg-slate-50 rounded-lg p-3">
+                          <h3 class="font-medium mb-3">Completed</h3>
+                          <div class="space-y-3">
+                            <!-- {% if task.status == 'completed' %} -->
+                              <div class="p-3 bg-white rounded-md border">
+                                <p class="font-medium">{{ task.title }}</p>
+                                <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
+                              </div>
+                            <!-- {% endif %} -->
+                          </div>
+                        </div>
+                      {% endif %}
+                  {% endfor %}
+                  
+                </div>
+                </section>
               
             </div>
-            </section>
-          
-        </div>
 
-        <!-- Right column -->
-        <div class="space-y-6">
-          <!-- Project Progress -->
-          <section class="bg-white rounded-xl shadow-sm">
-            <div class="p-5 border-b">
-              <h2 class="font-semibold text-lg">Project Progress</h2>
-            </div>
-            <div class="p-5 space-y-4">
-              <!-- Progress item -->
-              <div>
-                <div class="flex justify-between text-sm mb-1">
-                  <span>Website Redesign</span><span>80%</span>
+            <!-- Right column -->
+            <div class="space-y-6">
+              <!-- Project Progress -->
+              <section class="bg-white rounded-xl shadow-sm">
+                <div class="p-5 border-b">
+                  <h2 class="font-semibold text-lg">Project Progress</h2>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-2">
-                  <div class="bg-emerald-500 h-2 rounded-full" style="width:80%"></div>
+                <div class="p-5 space-y-4">
+                  <!-- Progress item -->
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Website Redesign</span><span>80%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                      <div class="bg-emerald-500 h-2 rounded-full" style="width:80%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Mobile App</span><span>50%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                      <div class="bg-blue-500 h-2 rounded-full" style="width:50%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Backend API</span><span>70%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                      <div class="bg-emerald-500 h-2 rounded-full" style="width:70%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Marketing Campaign</span><span>30%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                      <div class="bg-rose-500 h-2 rounded-full" style="width:30%"></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-sm mb-1">
-                  <span>Mobile App</span><span>50%</span>
-                </div>
-                <div class="w-full bg-slate-200 rounded-full h-2">
-                  <div class="bg-blue-500 h-2 rounded-full" style="width:50%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-sm mb-1">
-                  <span>Backend API</span><span>70%</span>
-                </div>
-                <div class="w-full bg-slate-200 rounded-full h-2">
-                  <div class="bg-emerald-500 h-2 rounded-full" style="width:70%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-sm mb-1">
-                  <span>Marketing Campaign</span><span>30%</span>
-                </div>
-                <div class="w-full bg-slate-200 rounded-full h-2">
-                  <div class="bg-rose-500 h-2 rounded-full" style="width:30%"></div>
-                </div>
-              </div>
-            </div>
-          </section>
+              </section>
 
-          <!-- Notifications -->
-          <section class="bg-white rounded-xl shadow-sm">
-            <div class="p-5 border-b">
-              <h2 class="font-semibold text-lg">Notifications</h2>
-            </div>
-            <ul class="p-5 space-y-3 text-sm">
-              <li class="flex items-start gap-3">
-                <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                <div><span class="font-medium">Akhil</span> assigned you a task • <span class="text-slate-500">10m ago</span></div>
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                <div>Task <span class="font-medium">“Design Homepage”</span> due tomorrow • <span class="text-slate-500">1h ago</span></div>
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                <div><span class="font-medium">Sarah</span> commented on <span class="font-medium">“Implement Auth”</span> • <span class="text-slate-500">3h ago</span></div>
-              </li>
-            </ul>
-          </section>
+              <!-- Notifications -->
+              <section class="bg-white rounded-xl shadow-sm">
+                <div class="p-5 border-b">
+                  <h2 class="font-semibold text-lg">Notifications</h2>
+                </div>
+                <ul class="p-5 space-y-3 text-sm">
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    <div><span class="font-medium">Akhil</span> assigned you a task • <span class="text-slate-500">10m ago</span></div>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    <div>Task <span class="font-medium">“Design Homepage”</span> due tomorrow • <span class="text-slate-500">1h ago</span></div>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <div><span class="font-medium">Sarah</span> commented on <span class="font-medium">“Implement Auth”</span> • <span class="text-slate-500">3h ago</span></div>
+                  </li>
+                </ul>
+              </section>
 
-          <!-- Reports & Analytics (simple bar chart) -->
-          <section class="bg-white rounded-xl shadow-sm">
-            <div class="p-5 border-b">
-              <h2 class="font-semibold text-lg">Reports & Analytics</h2>
+              <!-- Reports & Analytics (simple bar chart) -->
+              <section class="bg-white rounded-xl shadow-sm">
+                <div class="p-5 border-b">
+                  <h2 class="font-semibold text-lg">Reports & Analytics</h2>
+                </div>
+                <div class="p-5">
+                  <p class="text-sm text-slate-500 mb-3">Weekly Productivity</p>
+                  <div class="flex items-end gap-3 h-40">
+                    <div class="w-8 bg-blue-200 rounded-t h-16"></div>
+                    <div class="w-8 bg-blue-300 rounded-t h-24"></div>
+                    <div class="w-8 bg-blue-400 rounded-t h-32"></div>
+                    <div class="w-8 bg-blue-300 rounded-t h-24"></div>
+                    <div class="w-8 bg-blue-400 rounded-t h-28"></div>
+                  </div>
+                  <div class="flex justify-between text-xs text-slate-500 mt-2">
+                    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span>
+                  </div>
+                </div>
+              </section>
             </div>
-            <div class="p-5">
-              <p class="text-sm text-slate-500 mb-3">Weekly Productivity</p>
-              <div class="flex items-end gap-3 h-40">
-                <div class="w-8 bg-blue-200 rounded-t h-16"></div>
-                <div class="w-8 bg-blue-300 rounded-t h-24"></div>
-                <div class="w-8 bg-blue-400 rounded-t h-32"></div>
-                <div class="w-8 bg-blue-300 rounded-t h-24"></div>
-                <div class="w-8 bg-blue-400 rounded-t h-28"></div>
-              </div>
-              <div class="flex justify-between text-xs text-slate-500 mt-2">
-                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span>
-              </div>
-            </div>
-          </section>
+          </div>
         </div>
       </div>
     </main>
   </div>
+
+  <!-- JavaScript to handle tab swapping -->
+  <script>
+    // for project tab swap
+    document.getElementById('projectId').addEventListener('click', function(e) {
+      e.preventDefault();
+      fetch("{% url 'project_home' %}")
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('project_det_view').innerHTML = html;
+          document.getElementById('mainHead').innerHTML = "<h1></h1>";
+        })
+        .catch(error => console.error('Error loading project page:', error));
+    });
+
+    // for project detailed view
+    function proDetailView(projectid) {
+    fetch(`/project_detailed_view/${projectid}/`)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('project_det_view').innerHTML = html;
+          document.getElementById('mainHead').innerHTML = "<h1></h1>";
+        })
+        .catch(error => console.error('Error loading project page:', error));
+  
+    }
+
+  </script>
 </body>
 </html>

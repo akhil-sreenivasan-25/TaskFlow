@@ -8,80 +8,31 @@
 </head>
 <body class="bg-gray-100 p-6 font-sans">
 
-  <div class="max-w-5xl mx-auto">
+  <div id="swapTab" class="max-w-8xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">Projects Dashboard</h1>
 
     <!-- Project Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
       <!-- Project Card -->
-      <div class="bg-white rounded-lg shadow p-5">
-        <div class="flex justify-between items-center mb-2">
-          <h2 class="text-xl font-semibold">Marketing Automation</h2>
-          <span class="text-green-700 bg-green-100 text-xs px-3 py-1 rounded-full">Active</span>
+      {% for project in pro_det %}
+        <div class="bg-white rounded-lg shadow p-5">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="text-xl font-semibold">{{project.project_name}}</h2>
+            <span class="text-green-700 bg-green-100 text-xs px-3 py-1 rounded-full">{{project.status}}</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-2"><strong>Client:</strong>{{project.client_details.company_name}}</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Last Updated:</strong>{{project.end_date}}</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Tasks:</strong> {{project.t_count}} total, {{ project.pending_count}} completed</p>
+          <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+            <div class="bg-blue-500 h-2 rounded-full" style="width: 58%"></div>
+          </div>
+          <div class="flex gap-2">
+            <button id="projectId" onclick="proDetailView('{{ project.projectid }}')" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm">View</button>
+            <!-- <button class="bg-red-100 text-red-600 px-4 py-1 rounded hover:bg-red-200 text-sm">Edit</button> -->
+          </div>
         </div>
-        <p class="text-sm text-gray-600 mb-2"><strong>Owner:</strong> Akhil</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Last Updated:</strong> Sep 26, 2025</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Tasks:</strong> 12 total, 7 completed</p>
-        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
-          <div class="bg-blue-500 h-2 rounded-full" style="width: 58%"></div>
-        </div>
-        <div class="flex gap-2">
-          <button class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm">View</button>
-          <button class="bg-red-100 text-red-600 px-4 py-1 rounded hover:bg-red-200 text-sm">Edit</button>
-        </div>
-      </div>
-
-      <!-- Another Project Card -->
-      <div class="bg-white rounded-lg shadow p-5">
-        <div class="flex justify-between items-center mb-2">
-          <h2 class="text-xl font-semibold">CRM Integration</h2>
-          <span class="text-green-700 bg-green-100 text-xs px-3 py-1 rounded-full">Completed</span>
-        </div>
-        <p class="text-sm text-gray-600 mb-2"><strong>Owner:</strong> Priya</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Last Updated:</strong> Sep 20, 2025</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Tasks:</strong> 8 total, 8 completed</p>
-        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
-          <div class="bg-blue-500 h-2 rounded-full" style="width: 100%"></div>
-        </div>
-        <div class="flex gap-2">
-          <button class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm">View</button>
-          <button class="bg-red-100 text-red-600 px-4 py-1 rounded hover:bg-red-200 text-sm">Edit</button>
-        </div>
-      </div>
-
-      <!-- Another Project Card -->
-      <div class="bg-white rounded-lg shadow p-5">
-        <div class="flex justify-between items-center mb-2">
-          <h2 class="text-xl font-semibold">Website Redesign</h2>
-          <span class="text-yellow-700 bg-yellow-100 text-xs px-3 py-1 rounded-full">In Progress</span>
-        </div>
-        <p class="text-sm text-gray-600 mb-2"><strong>Owner:</strong> Dev</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Last Updated:</strong> Sep 24, 2025</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Tasks:</strong> 15 total, 9 completed</p>
-        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
-          <div class="bg-blue-500 h-2 rounded-full" style="width: 60%"></div>
-        </div>
-        <div class="flex gap-2">
-          <button class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm">View</button>
-          <button class="bg-red-100 text-red-600 px-4 py-1 rounded hover:bg-red-200 text-sm">Edit</button>
-        </div>
-      </div>
-
-      <!-- Archived Project -->
-      <div class="bg-white rounded-lg shadow p-5">
-        <div class="flex justify-between items-center mb-2">
-          <h2 class="text-xl font-semibold">Review Presentation Deck</h2>
-          <span class="text-red-700 bg-red-100 text-xs px-3 py-1 rounded-full">Archived</span>
-        </div>
-        <p class="text-sm text-gray-600 mb-2"><strong>Owner:</strong> Akhil</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Last Updated:</strong> Sep 12, 2025</p>
-        <p class="text-sm text-gray-600 mb-2"><strong>Tasks:</strong> —</p>
-        <div class="flex gap-2 mt-4">
-          <button class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm">View</button>
-          <button class="bg-red-100 text-red-600 px-4 py-1 rounded hover:bg-red-200 text-sm">Edit</button>
-        </div>
-      </div>
+      {% endfor %}
 
     </div>
   </div>
