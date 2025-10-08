@@ -52,7 +52,7 @@
         <!-- KPI cards -->
         <!-- count session -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div class="bg-white rounded-xl shadow-sm p-5">
+          <div id="proCount" class="bg-white rounded-xl shadow-sm p-5">
             <p class="text-slate-500 text-sm">Total Projects</p>
             <p class="text-3xl font-semibold">{{count.p_count}}</p>
           </div>
@@ -274,6 +274,17 @@
         .catch(error => console.error('Error loading project page:', error));
     });
 
+    document.getElementById('proCount').addEventListener('click', function(e) {
+      e.preventDefault();
+      fetch("{% url 'project_home' %}")
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('project_det_view').innerHTML = html;
+          document.getElementById('mainHead').innerHTML = "<h1></h1>";
+        })
+        .catch(error => console.error('Error loading project page:', error));
+    });
+
     // for project detailed view
     function proDetailView(projectid) {
     fetch(`/project_detailed_view/${projectid}/`)
@@ -285,6 +296,27 @@
         .catch(error => console.error('Error loading project page:', error));
   
     }
+
+
+    // function for project status change - project detailed view
+    document.getElementById('project_det_view').addEventListener('change', function (e) {
+      if (e.target && e.target.id === 'selectElementPro') {
+        const projectid=document.getElementById('pro_id').value;
+        const pro_status=String(e.target.value);
+        fetch(`/project_status_change/${projectid}/${pro_status}/`)
+          .then(response => response.text())
+          .then(data => {
+            proDetailView(projectid);
+            alert(data);
+          })
+          .catch(error => console.error('Error updating status:', error));
+      }
+    });
+
+
+    
+
+    
 
   </script>
 </body>

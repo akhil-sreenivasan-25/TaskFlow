@@ -204,7 +204,9 @@
         <label >Project ID :</label>
         <select name="p_id" id="p_id">
           {% for project in pro_details %}
-            <option value="{{project.projectid}}">&nbsp;{{project.projectid}}&nbsp;&nbsp;&nbsp;({{project.project_name}})</option>
+            {% if project.status != 'completed' %}
+              <option value="{{project.projectid}}">&nbsp;{{project.projectid}}&nbsp;&nbsp;&nbsp;({{project.project_name}})</option>
+            {% endif %}
           {% endfor %}
         </select>
         <label >Assigned to :</label>

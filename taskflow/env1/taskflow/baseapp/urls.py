@@ -30,5 +30,6 @@ urlpatterns = [
     path('client_det/', views.client_det, name='client_det'),
     path('project_detailed_view/<int:projectid>/', views.project_detailed_view, name='project_detailed_view'),
     path('edit_project/', views.project_edit, name="edit_project"),
-    path('project_edit/<int:projectid>/', views.project_edit_view, name='project_edit_view')
+    path('project_edit/<int:projectid>/', views.project_edit_view, name='project_edit_view'),
+    path('project_status_change/<int:projectid>/<str:pro_status>/', views.project_status_change, name='project_status_change')
 ]

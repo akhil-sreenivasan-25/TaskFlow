@@ -253,3 +253,29 @@ def project_edit_view(request,projectid):
         return JsonResponse(list(tot_emp),safe=False)
     else:
         return HttpResponse("invalid user")
+
+def project_status_change(request,projectid,pro_status):
+    if request.user.is_authenticated:
+        if request.method=="GET":
+            try:
+                project_obj=Project.objects.get(projectid=projectid)
+                if project_obj.status == pro_status:
+                    return HttpResponse("Status is already set to " + pro_status)
+                elif pro_status == 'completed':
+                    incomplete_tasks = Task.objects.filter(project=project_obj).exclude(status='completed')
+                    if incomplete_tasks.exists():
+                        return HttpResponse("Cannot mark project as completed. There are incomplete tasks.")
+                    else :
+                        project_obj.status=pro_status
+                        project_obj.save()
+                        return HttpResponse("Project marked as completed")
+                else:
+                    project_obj.status=pro_status
+                    project_obj.save()
+                    return HttpResponse("Project status updated to " + pro_status)
+            except Project.DoesNotExist:
+                return HttpResponse("Project does not exist")
+        else:
+            return HttpResponse("invalid access")
+    else:
+        return render(request,"log_page.html")
