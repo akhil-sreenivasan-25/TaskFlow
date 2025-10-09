@@ -313,7 +313,15 @@
       }
     });
 
+    // function for refresh page without redirection after comment submission - project detailed view page
+    function handleSubmitButton() {
+      setTimeout(function() {
+        projectid=document.getElementById('pro_id').value;
+        proDetailView(projectid);
 
+      }, 500); // slight delay to allow server to respond
+      return true;
+    }
     
 
     

@@ -118,11 +118,11 @@
       <h3 class="text-xl font-bold mb-4">Comments & Attachments</h3>
       
       <!-- Comment Form -->
-      <form method="POST" action="{% url 'project_comments' project.projectid %}" enctype="multipart/form-data" class="space-y-4">
+      <form method="POST" action="{% url 'project_comments' project.projectid %}" target="hiddenFrame" onsubmit="return handleSubmitButton();" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
         <div>
           <label for="comment" class="block text-sm font-medium text-gray-700">Your Comment</label>
-          <textarea id="comment" name="comment" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+          <textarea id="comment" name="comment" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required></textarea>
         </div>
 
         <div>
@@ -179,6 +179,9 @@
         alert("Select element not found");
       }
     });
+
+
+    
 
     
       // Redirect to the project edit page

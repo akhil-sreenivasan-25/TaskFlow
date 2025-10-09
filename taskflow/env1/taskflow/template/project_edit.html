@@ -201,7 +201,7 @@
   
   <div class="modal-content">
     <span class="close" onclick="closeModalProject()">&times;</span>
-    <h3>Add New Project</h3>
+    <h3>Update Project</h3>
       <form method="POST" action="{% url 'edit_project' %}" target="hiddenFrame" onsubmit="return handleSubmit();">
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
