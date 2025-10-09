@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect,HttpResponseRedirect
 from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
-from .models import CustomUser,Employee,Project,Task,client
+from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia
 from datetime import date,timedelta
 from datetime import datetime
 from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q
@@ -228,6 +228,7 @@ def project_home(request):
         return HttpResponse("invalid user")
     
     
+# detailed view of the project with task, client details and attatcked documents with comments
 def project_detailed_view(request,projectid):
     if request.user.is_authenticated:
         project_det=Project.objects.get(projectid=projectid)
@@ -235,13 +236,16 @@ def project_detailed_view(request,projectid):
         tasks_det=Task.objects.filter(project=projectid).select_related('assigned_to').order_by('-status')
         team_member_id=list(project_det.team_members.values_list('empid', flat=True))
         tot_emp=Employee.objects.exclude(Q(empid=request.user.id) | Q(empid__in=team_member_id ) | Q(is_active=False))
+        pro_comment=ProjectCommentMedia.objects.filter(project=project_det).select_related('uploaded_by').order_by('-uploaded_at')
 
         HttpResponse("project id is "+str(tasks_det))
         
-        return render(request,"project_detailed_view.html",{"project":project_det,"client":client_det,"tasks":tasks_det,"emp_det":tot_emp})
+        return render(request,"project_detailed_view.html",{"project":project_det,"client":client_det,"tasks":tasks_det,"emp_det":tot_emp,"comments":pro_comment})
     else:
         return HttpResponse("invalid user")
     
+
+# for editing project details - fetch employee details excluding tl and already assigned members
 def project_edit_view(request,projectid):
     if request.user.is_authenticated:
         u_id = int(request.user.id)
@@ -253,7 +257,9 @@ def project_edit_view(request,projectid):
         return JsonResponse(list(tot_emp),safe=False)
     else:
         return HttpResponse("invalid user")
+    
 
+# change project status by checking all tasks are completed or not
 def project_status_change(request,projectid,pro_status):
     if request.user.is_authenticated:
         if request.method=="GET":
@@ -279,3 +285,30 @@ def project_status_change(request,projectid,pro_status):
             return HttpResponse("invalid access")
     else:
         return render(request,"log_page.html")
+    
+
+def project_comments(request,projectid):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            comment=request.POST.get("comment")
+            attachment=request.FILES.getlist("attachment")
+            pro_obj=Project.objects.get(projectid=projectid)
+            user=request.user.id
+            emp_id=CustomUser.objects.get(id=user).empid
+            emp_id=Employee.objects.get(empid=emp_id)
+            if pro_obj and emp_id:
+                pro_comment=ProjectCommentMedia(project=pro_obj,uploaded_by=emp_id,comment=comment)
+                pro_comment.save()
+                for file in attachment:
+                    media=projectMedia(comment=pro_comment,file=file)
+                    media.save()
+                # return redirect('project_detailed_view',projectid=projectid)
+            else:
+                return HttpResponse("Invalid project or User")
+
+            # process and save the comment and attachment as needed
+            return HttpResponse("Comment and attachment received" + str(projectid) +   str(emp_id) + " "+ str(emp_id.empid))
+        else:
+            return HttpResponse("invalid access")
+    else:
+        return HttpResponse("project comments page")

@@ -16,6 +16,8 @@ Including another URLconf
 """
 
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
@@ -31,5 +33,6 @@ urlpatterns = [
     path('project_detailed_view/<int:projectid>/', views.project_detailed_view, name='project_detailed_view'),
     path('edit_project/', views.project_edit, name="edit_project"),
     path('project_edit/<int:projectid>/', views.project_edit_view, name='project_edit_view'),
-    path('project_status_change/<int:projectid>/<str:pro_status>/', views.project_status_change, name='project_status_change')
-]
+    path('project_status_change/<int:projectid>/<str:pro_status>/', views.project_status_change, name='project_status_change'),
+    path('project_comments/<int:projectid>/',views.project_comments,name='project_comments')
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -103,7 +103,7 @@
                   <td class="px-4 py-2">{{tasks.priority}}</td>
                   <td class="px-4 py-2">{{tasks.due_date}}</td>
                   <td class="px-4 py-2">backend, auth, admin</td>
-                  <td class="px-4 py-2 text-blue-600 font-semibold">Full Access</td>
+                  <td class="px-4 py-2 text-blue-600 font-semibold">View</td>
                 </tr>
               {% endfor %}
               <!-- Repeat for other members -->
@@ -118,7 +118,7 @@
       <h3 class="text-xl font-bold mb-4">Comments & Attachments</h3>
       
       <!-- Comment Form -->
-      <form method="POST" enctype="multipart/form-data" class="space-y-4">
+      <form method="POST" action="{% url 'project_comments' project.projectid %}" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
         <div>
           <label for="comment" class="block text-sm font-medium text-gray-700">Your Comment</label>
@@ -127,10 +127,10 @@
 
         <div>
           <label for="attachment" class="block text-sm font-medium text-gray-700">Attach Document</label>
-          <input type="file" id="attachment" name="attachment" class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+          <input type="file" multiple id="attachment" name="attachment" class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
         </div>
 
-        <button type="button" onclick="testMes()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
           Submit
         </button>
       </form>
@@ -139,14 +139,14 @@
       <div class="mt-6 space-y-4">
         {% for comment in comments %}
           <div class="border-t pt-4">
-            <p class="text-sm text-gray-800"><strong>{{ comment.user.username }}</strong> said:</p>
-            <p class="text-sm text-gray-600">{{ comment.text }}</p>
-            {% if comment.attachment %}
+            <p class="text-sm text-gray-800"><strong>{{ comment.uploaded_by.name }}</strong> said:</p>
+            <p class="text-sm text-gray-600">{{ comment.comment }}</p>
+            {% if comment.file %}
               <p class="text-sm mt-1">
-                📎 <a href="{{ comment.attachment.url }}" class="text-blue-600 hover:underline">Download Attachment</a>
+                📎 <a href="{{ comment.file.url }}" class="text-blue-600 hover:underline">Download Attachment</a>
               </p>
             {% endif %}
-            <p class="text-xs text-gray-400">{{ comment.created_at }}</p>
+            <p class="text-xs text-gray-400">{{ comment.uploaded_at }}</p>
           </div>
         {% empty %}
           <p class="text-sm text-gray-500">No comments yet.</p>

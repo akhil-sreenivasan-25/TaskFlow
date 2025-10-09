@@ -67,3 +67,36 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+def media_upload_path(instance, filename):
+    ext = filename.split('.')[-1].lower()
+    if ext in ['jpg', 'jpeg', 'png']:
+        folder = 'images'
+    elif ext in ['mp4', 'mov']:
+        folder = 'videos'
+    elif ext in ['mp3', 'wav']:
+        folder = 'audio'
+    elif ext in ['pdf', 'docx', 'xlsx']:
+        folder = 'documents'
+    else:
+        folder = 'others'
+    project_id = instance.comment.project.projectid if instance.comment and instance.comment.project else 'unknown'
+
+    return f'project_media/project_{project_id}/{folder}/{filename}'
+
+
+class ProjectCommentMedia(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='comments')
+    comment = models.TextField()
+    file = models.FileField( blank=True, null=True)
+    uploaded_by = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    # def __str__(self):
+    #     return f"Comment by {self.uploaded_by} on {self.project.name}"
+
+class projectMedia(models.Model):
+    comment=models.ForeignKey(ProjectCommentMedia,on_delete=models.CASCADE,related_name='media_files')
+    file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
+    uploaded_at=models.DateTimeField(auto_now_add=True)
