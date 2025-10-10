@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow – TL Project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="p-6 bg-gray-100 min-h-screen">
+
+        <!-- Team Member Task Table -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+          <h3 class="text-xl font-bold mb-4">Tasks</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm text-left border">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2">Task ID</th>
+                  <th class="px-4 py-2">Member</th>
+                  <th class="px-4 py-2">Role</th>
+                  <th class="px-4 py-2">Task</th>
+                  <th class="px-4 py-2">Status</th>
+                  <th class="px-4 py-2">Priority</th>
+                  <th class="px-4 py-2">Due Date</th>
+                  <th class="px-4 py-2">Tags</th>
+                  <th class="px-4 py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Example Row -->
+               
+                  <tr class="border-t">
+                    <td class="px-4 py-2 font-medium">{{tasks.taskid}}</td>
+                    <td class="px-4 py-2 font-medium">{{tasks.assigned_to.name}}</td>
+                    <td class="px-4 py-2">{{tasks.assigned_to.role}}</td>
+                    <td class="px-4 py-2">{{tasks.title}}</td>
+                    <td class="px-4 py-2 text-green-600">{{tasks.status}}</td>
+                    <td class="px-4 py-2">{{tasks.priority}}</td>
+                    <td class="px-4 py-2">{{tasks.due_date}}</td>
+                    <td class="px-4 py-2">backend, auth, admin</td>
+                    <td class="px-5 py-3 text-center">
+                      <input type="hidden" id="task_id" value="{{tasks.taskid}}">
+                        <select id="selectElementTask" class="px-2 py-1 text-blue-600 hover:underline" name="selectElementPro" >
+                            <option value="">-- Change Status --</option>
+                            <option value="in_progress"> In progress </option>
+                            <option value="pending"> Pending </option>
+                            <option value="completed"> Completed </option>
+                        </select>
+                        <!-- ?<button class="px-2 py-1 text-blue-600 hover:underline" onclick="taskDetails('{{ tasks.taskid }}')">View</button> -->
+                    </td>
+                  </tr>
+                
+                <!-- Repeat for other members -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+       
+
+        <!-- Comment Section -->
+       
+
+  </body>
+
+  <script>    
+  </script>
+  
+</html>

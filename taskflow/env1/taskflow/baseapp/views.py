@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia
 from datetime import date,timedelta
 from datetime import datetime
-from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q
+from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch
 
 # Create your views here.
 def test(request):
@@ -236,11 +236,13 @@ def project_detailed_view(request,projectid):
         tasks_det=Task.objects.filter(project=projectid).select_related('assigned_to').order_by('-status')
         team_member_id=list(project_det.team_members.values_list('empid', flat=True))
         tot_emp=Employee.objects.exclude(Q(empid=request.user.id) | Q(empid__in=team_member_id ) | Q(is_active=False))
-        pro_comment=ProjectCommentMedia.objects.filter(project=project_det).select_related('uploaded_by').order_by('-uploaded_at')
+        pro_comment=ProjectCommentMedia.objects.filter(project=project_det).select_related('uploaded_by')\
+            .prefetch_related(Prefetch('media_files', queryset=projectMedia.objects.only('file'))).order_by('-uploaded_at')
 
         HttpResponse("project id is "+str(tasks_det))
         
-        return render(request,"project_detailed_view.html",{"project":project_det,"client":client_det,"tasks":tasks_det,"emp_det":tot_emp,"comments":pro_comment})
+        return render(request,"project_detailed_view.html",\
+                      {"project":project_det,"client":client_det,"tasks":tasks_det,"emp_det":tot_emp,"comments":pro_comment})
     else:
         return HttpResponse("invalid user")
     
@@ -312,3 +314,33 @@ def project_comments(request,projectid):
             return HttpResponse("invalid access")
     else:
         return HttpResponse("project comments page")
+    
+# view for specific task details
+def pro_task_view(request,taskid):
+    if request.user.is_authenticated:
+        try:
+            task_det=Task.objects.select_related('assigned_to','project__team_lead').get(taskid=taskid)
+            return render(request,"pro_task_view.html",{"tasks":task_det})
+        except Task.DoesNotExist:
+            return HttpResponse("Task does not exist")
+    else:
+        return render(request,"log_page.html")
+    
+#view for change task status
+def change_task_status(request,task_id,new_status):
+    if request.user.is_authenticated:
+        if request.method=='GET':
+            try:
+                task_obj=Task.objects.get(taskid=task_id)
+                if task_obj.status == new_status:
+                    return HttpResponse("Status is already set to " + new_status)
+                else:
+                    task_obj.status=new_status
+                    task_obj.save()
+                    return HttpResponse("Task status updated to " + new_status)
+            except Task.DoesNotExist:
+                return HttpResponse("Task does not exist")
+        else:
+            return HttpResponse("invalid access")
+    else:
+        return render(request,"log_page.html")

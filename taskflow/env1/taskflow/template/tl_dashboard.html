@@ -274,6 +274,7 @@
         .catch(error => console.error('Error loading project page:', error));
     });
 
+       // for project detailed view
     document.getElementById('proCount').addEventListener('click', function(e) {
       e.preventDefault();
       fetch("{% url 'project_home' %}")
@@ -322,9 +323,31 @@
       }, 500); // slight delay to allow server to respond
       return true;
     }
+
+    function taskDetails(taskid){
+      alert(String(taskid));
+      fetch(`/pro_task_view/${taskid}/`)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('swapTask').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading project page:', error));
+    }
     
 
-    
+    // function for task status change - task detailed view
+    document.getElementById('project_det_view').addEventListener('change', function (e) {
+      if (e.target && e.target.id === 'selectElementTask') {
+          const taskid=document.getElementById('task_id').value;
+          const task_status=String(e.target.value);
+          fetch(`/change_task_status/${taskid}/${task_status}/`)
+            .then(response => response.text())
+            .then(data => {
+              taskDetails(taskid);
+            })
+            .catch(error => console.error('Error updating status:', error));
+      }
+    });
 
   </script>
 </body>
