@@ -201,7 +201,7 @@
   <div class="modal-content">
     <span class="close" onclick="closeModalProjectadd()">&times;</span>
     <h3>Add New Project</h3>
-      <form method="POST" action="{% url 'add_project' %}">
+      <form id="projectAddForm" method="POST" action="{% url 'add_project' %}">
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
           <input type="text" name="p_name" id="projectName" placeholder="Project Name" required>

@@ -195,27 +195,19 @@
 
 
   <div id="taskmodel" class="modal">
-    <form method="POST" action="{% url 'add_task' %}">
+    <form method="POST" id="taskAddForm" action="{% url 'add_task' %}" >
       {% csrf_token %}
       <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <h2>Add New Task</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
         <label >Project ID :</label>
-        <select name="p_id" id="p_id" required>
-          {% for project in pro_details %}
-            {% if project.status != 'completed' %}
-              <option value="{{project.projectid}}">&nbsp;{{project.projectid}}&nbsp;&nbsp;&nbsp;({{project.project_name}})</option>
-            {% endif %}
-          {% endfor %}
+        <select name="pId" id="pId" required>
+          <option value="">--Select Project--</option>
         </select>
         <label >Assigned to :</label>
         <select name="assign_to" id="assign_to" required>
           <option value="">--Select Employee--</option>
-          <!-- <option value="akhil">Akhil</option>
-          <option value="neha">Neha</option>
-          <option value="rahul">Rahul</option>
-          <option value="sneha">Sneha</option> -->
         </select>
         <label >Priority :</label>
         <select name="t_priority" id="t_priority" defaultValue="--Task priority--">
@@ -263,8 +255,35 @@
         .catch(error => console.error('Fetch error:', error));
     }
 
+    function fetchProject() {
+      fetch(`/tl_projects/`)
+        .then(response => response.json())
+        .then(data => {
+          const employeeSelect = document.getElementById('pId');
+          employeeSelect.innerHTML = '<option value="">--Select Project--</option>';
+          if (data.length === 0) {
+            // Add a disabled option to indicate no employees
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "No project available";
+            option.disabled = true;
+            employeeSelect.appendChild(option);
+          }
+          else {
+            data.forEach(pro => {
+              const option = document.createElement('option');
+              option.value = pro.id;
+              option.textContent = `(${pro.id})  ${pro.name}`;
+              employeeSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Fetch error:', error));
+      // document.getElementById("taskmodel").style.display = "block";
+    }
+
     // Trigger the function when project dropdown changes
-    document.getElementById('p_id').addEventListener('change', function() {
+    document.getElementById('pId').addEventListener('change', function() {
       const projectId = this.value;
       fetchEmployees(projectId); // Function is called here
     });
@@ -277,6 +296,7 @@
         container.classList.toggle('open');
       }
       function openModalTask() {
+        fetchProject();
         document.getElementById("taskmodel").style.display = "block";
       }
 

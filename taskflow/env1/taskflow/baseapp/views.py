@@ -131,9 +131,11 @@ def add_project(request):
                     continue  # Skip if the employee does not exist
 
             new_project.save()
-            return redirect('tl_home')
+            projectid=new_project.projectid
+            return JsonResponse({"success": True, "pro_id":projectid})
+
         else:
-            return HttpResponse("invalid access")
+            return JsonResponse({"success": False, "pro_id":projectid})
     else:
         return render(request,"log_page.html")
     
@@ -172,7 +174,7 @@ def add_task(request):
             t_due=datetime.strptime(t_due , '%Y-%m-%d').date()
             t_priority=request.POST.get("t_priority")
             t_assigned=request.POST.get("assign_to")
-            t_project=request.POST.get("p_id")
+            t_project=request.POST.get("pId")
 
             u_id = int(request.user.id)
             id=CustomUser.objects.get(id=u_id).empid
@@ -182,13 +184,13 @@ def add_task(request):
                 project_obj=Project.objects.get(projectid=t_project)
                 new_task=Task(title=t_title,description=t_desc,due_date=t_due,priority=t_priority,assigned_to=assigned_emp,project=project_obj)
                 new_task.save()
-                return redirect('tl_home')
+                return JsonResponse({"success": True, "pro_id":t_project})
             except Employee.DoesNotExist:
-                return HttpResponse("Assigned employee does not exist")
+                return JsonResponse("Assigned employee does not exist")
             except Project.DoesNotExist:
-                return HttpResponse("Project does not exist")
+                return JsonResponse("Project does not exist")
         else:
-            return HttpResponse("invalid access")
+            return JsonResponse("invalid access")
     else:
         return render(request,"log_page.html")
     
@@ -200,6 +202,19 @@ def team_member(request,projectid):
             projects_id=Project.objects.get(projectid=projectid)
             employees = projects_id.team_members.all()
             data = [{'id': emp.empid, 'name': emp.name} for emp in employees]
+            return JsonResponse(data, safe=False)
+        else :
+            return render(request,"log_page.html")
+        
+# fetch project details for task add 
+def tl_projects(request):
+    if request.method=="GET" :
+        if request.user.is_authenticated :
+            u_id = int(request.user.id)
+            id=CustomUser.objects.get(id=u_id).empid
+            tl_emp=Employee.objects.get(empid=id) 
+            tl_pro=Project.objects.filter(team_lead=tl_emp)
+            data = [{'id': pro.projectid, 'name': pro.project_name} for pro in tl_pro]
             return JsonResponse(data, safe=False)
         else :
             return render(request,"log_page.html")

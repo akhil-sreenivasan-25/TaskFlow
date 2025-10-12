@@ -16,7 +16,7 @@
         <span class="text-xl font-semibold">TaskFlow</span>
       </div>
       <nav class="p-3 space-y-1 text-sm">
-        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800" href="{% url 'tl_home' %}">
+        <a id="tlHome" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800" href="{% url 'tl_home' %}">
           <span>🏠</span><span>Dashboard</span>
         </a>
         <a id="projectId" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📁 Projects</a>
@@ -348,6 +348,11 @@
       return true;
     }
 
+    function handleTaskAddButton(){
+      projectid=document.getElementById(pId).value;
+      proDetailView(projectid);
+    }
+
     function taskDetails(taskid){
       fetch(`/pro_task_view/${taskid}/`)
         .then(response => response.text())
@@ -391,6 +396,57 @@
       }, 500); // slight delay to allow server to respond
       return true;
     }
+
+
+    // function to add new project and task - reusable function for both project and task add
+    function submitFormViaAjax(form, url, onSuccess) {
+      let formData = new FormData(form);
+      let csrfToken = form.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+      fetch(url, {
+          method: "POST",
+          headers: {
+              "X-CSRFToken": csrfToken
+          },
+          body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              form.reset();
+              if (typeof onSuccess === "function") {
+                  onSuccess(data); // Pass response data to your callback
+              }
+          } else {
+              closeModal();
+              console.error("Form errors:", data.errors);
+          }
+      })
+      .catch(error => console.error("AJAX error:", error));
+    }
+
+    // call from task add popup for load project detailed view after adding new task
+    document.getElementById("taskAddForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      submitFormViaAjax(this, this.action, function(data) {
+          closeModal();
+          proDetailView(data.pro_id); // Show project detail view
+      });
+    });
+
+
+    // call from project add popup for load project detailed view after adding new project
+    document.getElementById("projectAddForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      submitFormViaAjax(this, this.action, function(data) {
+          closeModalProjectadd();
+          proDetailView(data.pro_id); // Show project detail view
+      });
+    });
+
+
   </script>
 </body>
 </html>
