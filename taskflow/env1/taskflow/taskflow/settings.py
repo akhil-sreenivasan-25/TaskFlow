@@ -119,7 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC' #for international time zone
+TIME_ZONE = 'Asia/Kolkata' #for india time zone
+USE_TZ = False
+
 
 USE_I18N = True
 

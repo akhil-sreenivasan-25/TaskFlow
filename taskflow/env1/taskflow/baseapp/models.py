@@ -81,11 +81,23 @@ def media_upload_path(instance, filename):
         folder = 'documents'
     else:
         folder = 'others'
-    project_id = instance.comment.project.projectid if instance.comment and instance.comment.project else 'unknown'
+    # project_id = instance.comment.project.projectid if instance.comment and instance.comment.project else 'unknown'
+    if hasattr(instance, 'comment'):
+        if hasattr(instance.comment, 'project') and instance.comment.project:
+            context_id = f'project_{instance.comment.project.projectid}'
+        elif hasattr(instance.comment, 'task') and instance.comment.task:
+            context_id = f'task_{instance.comment.task.taskid}'
+        else:
+            context_id = 'unknown'
+    else:
+        context_id = 'unknown'
 
-    return f'project_media/project_{project_id}/{folder}/{filename}'
 
 
+    return f'project_media/{context_id}/{folder}/{filename}'
+    # return f'project_media/project_{project_id}/{folder}/{filename}'
+
+# porject comments and media
 class ProjectCommentMedia(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='comments')
     comment = models.TextField()
@@ -98,5 +110,22 @@ class ProjectCommentMedia(models.Model):
 
 class projectMedia(models.Model):
     comment=models.ForeignKey(ProjectCommentMedia,on_delete=models.CASCADE,related_name='media_files')
+    file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
+    uploaded_at=models.DateTimeField(auto_now_add=True)
+
+
+# porject comments and media
+class taskCommentMedia(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_comments')
+    comment = models.TextField()
+    file = models.FileField( blank=True, null=True)
+    uploaded_by = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    # def __str__(self):
+    #     return f"Comment by {self.uploaded_by} on {self.project.name}"
+
+class tasktMedia(models.Model):
+    comment=models.ForeignKey(taskCommentMedia,on_delete=models.CASCADE,related_name='task_media_files')
     file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
     uploaded_at=models.DateTimeField(auto_now_add=True)

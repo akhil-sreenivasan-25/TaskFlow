@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlows – Task Tab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 font-sans">
+
+  <div class="max-w-8xl mx-auto">
+    <!-- <h1 class="text-3xl font-bold mb-6">Task Dashboard</h1> -->
+
+    <!-- Project Cards -->
+    <div >
+
+       <!-- Team Member Task Table -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+          <h3 class="text-xl font-bold mb-4">Tasks</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm text-left border">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2">Task ID</th>
+                  <th class="px-4 py-2">Member</th>
+                  <th class="px-4 py-2">Role</th>
+                  <th class="px-4 py-2">Project</th>
+                  <th class="px-4 py-2">Task</th>
+                  <th class="px-4 py-2">Status</th>
+                  <th class="px-4 py-2">Priority</th>
+                  <th class="px-4 py-2">Due Date</th>
+                  <th class="px-4 py-2">Tags</th>
+                  <th class="px-4 py-2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Example Row -->
+                {% for tasks in task_det %}
+                  <tr class="border-t">
+                    <td class="px-4 py-2 font-medium">{{tasks.taskid}}</td>
+                    <td class="px-4 py-2 font-medium">{{tasks.assigned_to.name}}</td>
+                    <td class="px-4 py-2">{{tasks.assigned_to.role}}</td>
+                    <td class="px-4 py-2 font-medium">{{tasks.project.project_name}}</td>
+                    <td class="px-4 py-2">{{tasks.title}}</td>
+                    <td class="px-4 py-2 text-green-600">{{tasks.status}}</td>
+                    <td class="px-4 py-2">{{tasks.priority}}</td>
+                    <td class="px-4 py-2">{{tasks.due_date}}</td>
+                    <td class="px-4 py-2">backend, auth, admin</td>
+                    <td class="px-5 py-3 text-center">
+                      <input type="hidden" id="task_id" value="{{tasks.taskid}}">                       
+                      <button class="px-2 py-1 text-blue-600 hover:underline" onclick="taskDetails1('{{ tasks.taskid }}' , '{{ tasks.project.projectid }}')">View</button>
+                    </td>
+                        <!-- ?<button class="px-2 py-1 text-blue-600 hover:underline" onclick="taskDetails('{{ tasks.taskid }}')">View</button> -->
+                    </td>
+                  </tr>
+                {% endfor %}
+                
+                <!-- Repeat for other members -->
+              </tbody>
+            </table>
+          </div>
+    </div>
+  </div>
+
+</body>
+</html>

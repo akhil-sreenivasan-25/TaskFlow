@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse,redirect,HttpResponseRedirect
 from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
-from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia
+from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia,taskCommentMedia,tasktMedia
 from datetime import date,timedelta
 from datetime import datetime
 from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch
@@ -82,7 +82,7 @@ def tl_home(request):
          #member_task_count=Task
 
          #task tracking
-         tl_all_tasks=Task.objects.filter(project__in=tl_projects).values('title','due_date','priority','status').order_by('due_date')
+         tl_all_tasks=Task.objects.filter(project__in=tl_projects).order_by('due_date')
 
          #project progress
          tl_projects=emp_obj.led_projects.exclude(status='completed').values_list('projectid', flat=True)
@@ -293,11 +293,11 @@ def project_comments(request,projectid):
     if request.user.is_authenticated:
         if request.method=="POST":
             comment=request.POST.get("comment")
-            attachment=request.FILES.getlist("attachment")
-            pro_obj=Project.objects.get(projectid=projectid)
+            attachment=request.FILES.getlist("attachment")            
             user=request.user.id
             emp_id=CustomUser.objects.get(id=user).empid
             emp_id=Employee.objects.get(empid=emp_id)
+            pro_obj=Project.objects.get(projectid=projectid)
             if pro_obj and emp_id:
                 pro_comment=ProjectCommentMedia(project=pro_obj,uploaded_by=emp_id,comment=comment)
                 pro_comment.save()
@@ -320,7 +320,9 @@ def pro_task_view(request,taskid):
     if request.user.is_authenticated:
         try:
             task_det=Task.objects.select_related('assigned_to','project__team_lead').get(taskid=taskid)
-            return render(request,"pro_task_view.html",{"tasks":task_det})
+            task_comment=taskCommentMedia.objects.filter(task=task_det).select_related('uploaded_by')\
+            .prefetch_related(Prefetch('task_media_files', queryset=tasktMedia.objects.only('file'))).order_by('-uploaded_at')
+            return render(request,"pro_task_view.html",{"tasks":task_det,"comments_task":task_comment})
         except Task.DoesNotExist:
             return HttpResponse("Task does not exist")
     else:
@@ -342,5 +344,41 @@ def change_task_status(request,task_id,new_status):
                 return HttpResponse("Task does not exist")
         else:
             return HttpResponse("invalid access")
+    else:
+        return render(request,"log_page.html")
+    
+def task_comments(request,taskid):
+    if request.user.is_authenticated:
+        if request.method=="POST":
+            comment=request.POST.get("comment")
+            attachment=request.FILES.getlist("attachment")            
+            user=request.user.id
+            emp_id=CustomUser.objects.get(id=user).empid
+            emp_id=Employee.objects.get(empid=emp_id)
+            task_obj=Task.objects.get(taskid=taskid)
+            if task_obj and emp_id:
+                task_comment=taskCommentMedia(task=task_obj,uploaded_by=emp_id,comment=comment)
+                task_comment.save()
+                for file in attachment:
+                    media=tasktMedia(comment=task_comment,file=file)
+                    media.save()
+                # return redirect('project_detailed_view',projectid=projectid)
+            else:
+                return HttpResponse("Invalid task or User")
+
+            # process and save the comment and attachment as needed
+            return HttpResponse("Comment and attachment received" + str(taskid) +   str(emp_id) + " "+ str(emp_id.empid))
+        else:
+            return HttpResponse("invalid access")
+    else:
+        return HttpResponse("task comments page")
+
+def task_det(request):
+    if request.user.is_authenticated:
+        u_id =int(request.user.id)
+        id=CustomUser.objects.get(id=u_id).empid
+        emp_obj=Employee.objects.get(empid=id)
+        task_obj=Task.objects.filter(project__team_lead=emp_obj).select_related('assigned_to').order_by('-status','due_date')
+        return render(request,"task_det.html",{"task_det":task_obj})
     else:
         return render(request,"log_page.html")

@@ -205,14 +205,14 @@
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
           <input type="text" name="p_name" id="projectName" placeholder="Project Name" required>
-          <textarea id="description" name="p_desc" rows="4" placeholder="Enter details here..."></textarea>
+          <textarea id="description" name="p_desc" rows="4" placeholder="Enter details here..." required></textarea>
           <!-- <input type="text" name="p_desc" id="projectDscription" placeholder="Disccription" required><br> -->
           <label>Client</label>
           <select name="client" id="client" required>
             <option value="">--Select Employee--</option>
           </select>
           <label>End Date   :</label>
-          <input type="date" name="p_end" id="projectdate" placeholder="End Date">
+          <input type="date" name="p_end" id="projectdate" placeholder="End Date" required>
           
         </div>
         <div class ='container'>
