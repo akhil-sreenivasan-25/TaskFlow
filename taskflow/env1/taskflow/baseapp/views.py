@@ -82,7 +82,7 @@ def tl_home(request):
          #member_task_count=Task
 
          #task tracking
-         tl_all_tasks=Task.objects.filter(project__in=tl_projects).order_by('due_date')
+         tl_all_tasks=Task.objects.filter(project__in=tl_projects).order_by('due_date')[:8]
 
          #project progress
          tl_projects=emp_obj.led_projects.exclude(status='completed').values_list('projectid', flat=True)
