@@ -10,7 +10,7 @@
   <div class="flex min-h-screen">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-slate-100 flex flex-col">
+    <aside class="fixed top-0 left-0 h-screen w-64 bg-slate-900 text-slate-100 flex flex-col">
       <div class="px-6 py-5 border-b border-slate-800 flex items-center gap-3">
         <div class="w-8 h-8 rounded-full bg-blue-500"></div>
         <span class="text-xl font-semibold">TaskFlow</span>
@@ -28,9 +28,9 @@
     </aside>
 
     <!-- Main -->
-    <main class="flex-1 p-6 md:p-8">
+    <main class="ml-64 p-6 md:p-8 pt-20">
       <!-- Header -->
-      <header class="flex items-center justify-between mb-6">
+      <header class="fixed top-0 left-64 w-[calc(100%-16rem)] z-30 bg-gray-100 flex items-center justify-between px-6 py-4 shadow">
         <div id="mainHead" class="text-2xl md:text-3xl font-bold">
           <h1 >Dashboard</h1>
         </div>
@@ -48,7 +48,7 @@
         </div>
       </header>
 
-      <div id="project_det_view">
+      <div id="project_det_view" class="mt-[72px]">
         <!-- KPI cards -->
         <!-- count session -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -102,7 +102,7 @@
                             </td>
                             <td class="px-5 py-3">{{emp.member_task_count}}</td>
                             <td class="px-5 py-3 text-center">
-                              <button class="px-2 py-1 text-blue-600 hover:underline">{{ test_data }}</button>
+                              <button class="px-2 py-1 text-blue-600 hover:underline"> bhh</button>
                             </td>                      
                         </tr>
                       {% endfor %}
@@ -186,38 +186,47 @@
                 </div>
                 <div class="p-5 space-y-4">
                   <!-- Progress item -->
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>Website Redesign</span><span>80%</span>
+                  {% for project in pro_details %}
+                    <div onclick="proDetailView('{{ project.project__projectid }}')" >              
+                      {% if project.percent_completed <= 30 %}
+                        <div class="flex justify-between text-sm mb-1">
+                        <span>{{ project.project__project_name }}</span><span id="pro_per">below 30%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                          <div id="progressBar" class="bg-rose-500 h-2 rounded-full" style="width: 30%;" ></div>
+                        </div>
+                      {% endif %}
+                      {% if project.percent_completed <= 70 and project.percent_completed > 30 %}
+                        <div class="flex justify-between text-sm mb-1">
+                        <span>{{ project.project__project_name }}</span><span id="pro_per"> below 50%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                          <div id="progressBar" class="bg-blue-500 h-2 rounded-full" style="width: 50%;" ></div>
+                        </div>
+                      {% endif %}                      
+                      {% if project.percent_completed <= 95 and project.percent_completed > 70 %}
+                        <div class="flex justify-between text-sm mb-1">
+                        <span>{{ project.project__project_name }}</span><span id="pro_per"> below 90%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                          <div id="progressBar" class="bg-emerald-500 h-2 rounded-full" style="width: 90%;" ></div>
+                        </div>
+                      {% endif %}
+                      {% if project.percent_completed == 100 %}
+                        <div class="flex justify-between text-sm mb-1">
+                        <span>{{ project.project__project_name }}</span><span id="pro_per"> 100%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                          <div id="progressBar" class="bg-emerald-500 h-2 rounded-full" style="width: 100%;" ></div>
+                        </div>
+                      {% endif %}
+
                     </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                      <div class="bg-emerald-500 h-2 rounded-full" style="width:80%"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>Mobile App</span><span>50%</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                      <div class="bg-blue-500 h-2 rounded-full" style="width:50%"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>Backend API</span><span>70%</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                      <div class="bg-emerald-500 h-2 rounded-full" style="width:70%"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-sm mb-1">
-                      <span>Marketing Campaign</span><span>30%</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                      <div class="bg-rose-500 h-2 rounded-full" style="width:30%"></div>
-                    </div>
-                  </div>
+                  {% endfor %} 
+                  <div onclick="projectView()" class="flex justify-between text-sm mb-1">
+                    <!-- <button class="px-2 py-1 text-blue-600 hover:underline">... More projects ...</button> -->
+                    <a></a><span id="pro_per"><button class="px-2 py-1 text-blue-600 hover:underline">... More projects ...</button></span>
+                  </div>                             
                 </div>
               </section>
 
@@ -277,7 +286,7 @@
         .then(response => response.text())
         .then(html => {
           document.getElementById('project_det_view').innerHTML = html;
-          document.getElementById('mainHead').innerHTML = "<h1></h1>";
+          document.getElementById('mainHead').innerHTML = "<h1>Projects Dashboard</h1>";
         })
         .catch(error => console.error('Error loading project page:', error));
     });
@@ -287,9 +296,13 @@
         .then(response => response.text())
         .then(html => {
           document.getElementById('project_det_view').innerHTML = html;
-          document.getElementById('mainHead').innerHTML = "<h1></h1>";
+          document.getElementById('mainHead').innerHTML = "<h1>Task</h1>";
         })
         .catch(error => console.error('Error loading project page:', error));
+    }
+
+    function projectView(){
+      document.getElementById('proCount').click();
     }
 
        // for project detailed view
@@ -299,7 +312,7 @@
         .then(response => response.text())
         .then(html => {
           document.getElementById('project_det_view').innerHTML = html;
-          document.getElementById('mainHead').innerHTML = "<h1></h1>";
+          document.getElementById('mainHead').innerHTML = "<h1>Projects Dashboard</h1>";
         })
         .catch(error => console.error('Error loading project page:', error));
     });
@@ -331,6 +344,16 @@
           .catch(error => console.error('Error updating status:', error));
       }
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const percentText = document.getElementById("pro_per").textContent.trim(); // e.g., "80%"
+      const progressBar = document.getElementById("progressBar");
+
+      if (percentText.endsWith("%")) {
+        progressBar.style.width = percentText; // sets width to "80%"
+      }
+    });
+
 
     // function for refresh page without redirection after comment submission - project detailed view page
     function handleSubmitButton() {

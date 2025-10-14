@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia,taskCommentMedia,tasktMedia
 from datetime import date,timedelta
 from datetime import datetime
-from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch
+from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch,F
 
 # Create your views here.
 def test(request):
@@ -96,10 +96,16 @@ def tl_home(request):
          tot_emp=Employee.objects.exclude(Q(empid=emp_obj.empid) | Q(is_active=False))
 
         #project details for add new task
-         tl_projects_det=emp_obj.led_projects.exclude(status='completed').values('projectid','project_name')
+         tl_projects_det=emp_obj.led_projects.exclude(status='completed').order_by('end_date').values('projectid','project_name','end_date')[:10]
+
+         test=Task.objects.filter(project__in=tl_projects).values('project','project__project_name','project__projectid').\
+            annotate(total=Count('taskid'),taskcompleted=Count('taskid', filter=Q(status='completed')))\
+                     .annotate(percent_completed=ExpressionWrapper(100.0 * F('taskcompleted') / F('total'),output_field=IntegerField()))\
+                        .order_by('project__end_date') 
+        #  test=test.annotate((pro_prec= 'test.taskcompleted' / 'test.total') * 100 )
 
          task_det=0
-         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":tl_projects,"emp_det":tot_emp,"emp_obj":emp_obj,"pro_details":tl_projects_det})
+         return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":test,"emp_det":tot_emp,"emp_obj":emp_obj,"pro_details":test})
     else:
         return  HttpResponse("invalid user")
     
