@@ -16,9 +16,15 @@
         <span class="text-xl font-semibold">TaskFlow</span>
       </div>
       <nav class="p-3 space-y-1 text-sm">
-        <a id="tlHome" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="{% url 'tl_home' %}">
-          <span>🏠</span><span>Dashboard</span>
-        </a>
+        {% if count.user_det == 'team leader' %}
+          <a id="tlHome" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="{% url 'tl_home' %}">
+            <span>🏠</span><span>Dashboard</span>
+          </a>
+        {% else %}
+          <a id="tlHome" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="{% url 'member_home' %}">
+            <span>🏠</span><span>Dashboard</span>
+          </a>
+        {% endif %}
         <a id="projectId" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📁 Projects</a>
         <a id="taskId" onclick="openTask()" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">✅ Tasks</a>
         <!-- <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📊 Reports</a>
@@ -42,8 +48,10 @@
           {% include 'logout_session.html'%}
           {% include 'project_edit.html' %}
           <!-- pop window included end -->
-          <button onclick="openModalProject()" class="hidden md:inline-flex px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" >+ New Project</button>
-          <button onclick="openModalTask()" class="px-3 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">+ New Task</button>
+          {% if count.user_det == 'team leader' %}
+            <button onclick="openModalProject()" class="hidden md:inline-flex px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" >+ New Project</button>
+            <button onclick="openModalTask()" class="px-3 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">+ New Task</button>
+          {% endif %}
           <button id="profileId" onclick="toggleProfileMenu()" class="w-9 h-9 rounded-full bg-blue-500 ring-2 ring-blue-200 flex items-center justify-center text-white font-semibold"> AK</button>
         </div>
       </header>
@@ -71,45 +79,47 @@
             <!-- Left column -->
             <div  class="xl:col-span-2 space-y-6">
               <!-- Team Management -->
-              <section class="bg-white rounded-xl shadow-sm">
-                <div class="p-5 border-b">
-                  <h2 class="font-semibold text-lg">Team Management</h2>
-                </div>
-                <div class="overflow-x-auto">
-                  <table class="min-w-full text-sm">
-                    <thead class="bg-slate-50">
-                      <tr class="text-left text-slate-600">
-                        <th class="px-5 py-3">Name</th>
-                        <th class="px-5 py-3">Role</th>
-                        <th class="px-5 py-3">Status</th>
-                        <th class="px-5 py-3">Tasks Assigned</th>
-                        <th class="px-5 py-3 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for emp in emp_manage %}
-                        <tr class="border-t">
-                            <td class="px-5 py-3">{{emp.name}}</td>
-                            <td class="px-5 py-3">{{emp.role}}</td>
-                            <td class="px-5 py-3">
-                              <span class="text-emerald-600 font-medium">
-                                {% if emp.is_active  %}
-                                  Active
-                                {% else %}
-                                  Idle
-                                {% endif %}                          
-                              </span>
-                            </td>
-                            <td class="px-5 py-3">{{emp.member_task_count}}</td>
-                            <td class="px-5 py-3 text-center">
-                              <button class="px-2 py-1 text-blue-600 hover:underline"> bhh</button>
-                            </td>                      
+              {% if count.user_det == 'team leader' %}
+                <section class="bg-white rounded-xl shadow-sm">
+                  <div class="p-5 border-b">
+                    <h2 class="font-semibold text-lg">Team Management</h2>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                      <thead class="bg-slate-50">
+                        <tr class="text-left text-slate-600">
+                          <th class="px-5 py-3">Name</th>
+                          <th class="px-5 py-3">Role</th>
+                          <th class="px-5 py-3">Status</th>
+                          <th class="px-5 py-3">Tasks Assigned</th>
+                          <th class="px-5 py-3 text-center">Actions</th>
                         </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+                      </thead>
+                      <tbody>
+                        {% for emp in emp_manage %}
+                          <tr class="border-t">
+                              <td class="px-5 py-3">{{emp.name}}</td>
+                              <td class="px-5 py-3">{{emp.role}}</td>
+                              <td class="px-5 py-3">
+                                <span class="text-emerald-600 font-medium">
+                                  {% if emp.is_active  %}
+                                    Active
+                                  {% else %}
+                                    Idle
+                                  {% endif %}                          
+                                </span>
+                              </td>
+                              <td class="px-5 py-3">{{emp.member_task_count}}</td>
+                              <td class="px-5 py-3 text-center">
+                                <button class="px-2 py-1 text-blue-600 hover:underline"> bhh</button>
+                              </td>                      
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              {% endif %}
 
               <!-- Task Tracking (Kanban) -->         
                 <section class="bg-white rounded-xl shadow-sm">

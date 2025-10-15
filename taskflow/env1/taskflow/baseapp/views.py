@@ -69,7 +69,7 @@ def tl_home(request):
              task_deadline_count=Task.objects.filter(project__in=tl_projects,due_date__lte=day_differnce).exclude(status='completed').count()
              pro_deadline_count=emp_obj.led_projects.filter(end_date__lte=day_differnce).exclude(status='completed').count()
              deadline_count=task_deadline_count + pro_deadline_count
-         tl_count={"p_count":project_count,"t_count":task_count,'dl_count':deadline_count}
+         tl_count={"p_count":project_count,"t_count":task_count,'dl_count':deadline_count,'user_det':emp_obj.role }
 
          #team management
          # Select distinct employees who are assigned to tasks in any of the projects led by the current team lead (tl_projects)
@@ -98,6 +98,7 @@ def tl_home(request):
         #project details for add new task
          tl_projects_det=emp_obj.led_projects.exclude(status='completed').order_by('end_date').values('projectid','project_name','end_date')[:10]
 
+        # project progress
          test=Task.objects.filter(project__in=tl_projects).values('project','project__project_name','project__projectid').\
             annotate(total=Count('taskid'),taskcompleted=Count('taskid', filter=Q(status='completed')))\
                      .annotate(percent_completed=ExpressionWrapper(100.0 * F('taskcompleted') / F('total'),output_field=IntegerField()))\
@@ -108,6 +109,44 @@ def tl_home(request):
          return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":test,"emp_det":tot_emp,"emp_obj":emp_obj,"pro_details":test})
     else:
         return  HttpResponse("invalid user")
+    
+
+def member_home(request):
+    if request.user.is_authenticated:
+        u_id = int(request.user.id)        
+        id=CustomUser.objects.get(id=u_id).empid        
+        emp_obj=Employee.objects.get(empid=id)
+        # return HttpResponse(str(emp_obj.empid))
+        if(emp_obj.projects.count()==0):
+            project_count=0
+            task_count=0
+            deadline_count=0          
+            return HttpResponse(str(project_count) + str(task_count) + str(deadline_count))
+        else:
+            project_count= emp_obj.projects.exclude(status='completed').count()
+            member_projects=emp_obj.projects.exclude(status='completed').values('projectid')
+            task_count=Task.objects.filter(project__in=member_projects).exclude(status='completed').count()
+
+            #deadline count project + task
+            # tasks with due date within next 5 days and not completed
+            day_differnce=date.today() + timedelta(days=5) 
+            task_deadline_count=Task.objects.filter(project__in=member_projects,due_date__lte=day_differnce).exclude(status='completed').count()
+            pro_deadline_count=emp_obj.projects.filter(end_date__lte=day_differnce).exclude(status='completed').count()
+            deadline_count=task_deadline_count + pro_deadline_count
+        tl_count={"p_count":project_count,"t_count":task_count,'dl_count':deadline_count,'user_det':emp_obj.role }
+
+        mem_all_tasks=Task.objects.filter(assigned_to=emp_obj).order_by('due_date')[:11]
+
+        member_projects=emp_obj.projects.exclude(status='completed').values('projectid')
+        test=Task.objects.filter(project__in=member_projects).values('project','project__project_name','project__projectid').\
+            annotate(total=Count('taskid'),taskcompleted=Count('taskid', filter=Q(status='completed')))\
+                     .annotate(percent_completed=ExpressionWrapper(100.0 * F('taskcompleted') / F('total'),output_field=IntegerField()))\
+                        .order_by('project__end_date')
+     
+        return  render(request,"tl_dashboard.html",{"count":tl_count,"pro_tasks":mem_all_tasks,"pro_details":test,"test_data":test,"emp_obj":emp_obj,"pro_details":test})
+        return HttpResponse( "i am"+str(project_count) + "hy" + str(member_projects)  + "you"+ str(task_count))
+    else:
+        return render(request,"log_page.html")
     
 def add_project(request):
     if request.user.is_authenticated:
@@ -242,8 +281,15 @@ def project_home(request):
         if(emp_obj.led_projects.count()==0):
             alert="No projects assigned"
         else:
-            project_obj=Project.objects.filter(team_lead=emp_obj).order_by('end_date').select_related('client_details')
-            count_obj=project_obj.annotate(t_count=Count('tasks')).annotate(pending_count=Count('tasks', filter=Q(tasks__status='completed')))
+            if(emp_obj.role == 'team leader'):            
+                project_obj=Project.objects.filter(team_lead=emp_obj).order_by('end_date').select_related('client_details')
+                count_obj=project_obj.annotate(t_count=Count('tasks')).annotate(pending_count=Count('tasks', filter=Q(tasks__status='completed')))
+            else:
+
+                member_projects=emp_obj.projects.values_list('projectid',flat=True)
+                projects=emp_obj.projects.projectid
+                project_obj=Project.objects.filter(projectid__in=member_projects).order_by('end_date').select_related('client_details')
+                count_obj=project_obj.annotate(t_count=Count('tasks')).annotate(pending_count=Count('tasks', filter=Q(tasks__status='completed')))
             return  render(request,"project_det.html",{"pro_det":count_obj})
     else:
         return HttpResponse("invalid user")
@@ -252,6 +298,9 @@ def project_home(request):
 # detailed view of the project with task, client details and attatcked documents with comments
 def project_detailed_view(request,projectid):
     if request.user.is_authenticated:
+        u_id =int(request.user.id)
+        id=CustomUser.objects.get(id=u_id).empid
+        emp_obj=Employee.objects.get(empid=id)
         project_det=Project.objects.get(projectid=projectid)
         client_det=project_det.client_details
         tasks_det=Task.objects.filter(project=projectid).select_related('assigned_to').order_by('-status')
@@ -263,7 +312,7 @@ def project_detailed_view(request,projectid):
         HttpResponse("project id is "+str(tasks_det))
         
         return render(request,"project_detailed_view.html",\
-                      {"project":project_det,"client":client_det,"tasks":tasks_det,"emp_det":tot_emp,"comments":pro_comment})
+                      {"project":project_det,"client":client_det,"tasks":tasks_det,"role":emp_obj,"emp_det":tot_emp,"comments":pro_comment})
     else:
         return HttpResponse("invalid user")
     
@@ -399,7 +448,10 @@ def task_det(request):
         u_id =int(request.user.id)
         id=CustomUser.objects.get(id=u_id).empid
         emp_obj=Employee.objects.get(empid=id)
-        task_obj=Task.objects.filter(project__team_lead=emp_obj).select_related('assigned_to').order_by('-status','due_date')
+        if(emp_obj.role == 'team leader'):
+            task_obj=Task.objects.filter(project__team_lead=emp_obj).select_related('assigned_to').order_by('-status','due_date')
+        else :
+            task_obj=Task.objects.filter(assigned_to=emp_obj).select_related('assigned_to').order_by('-status','due_date')
         return render(request,"task_det.html",{"task_det":task_obj})
     else:
         return render(request,"log_page.html")
