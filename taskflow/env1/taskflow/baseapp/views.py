@@ -278,19 +278,23 @@ def project_home(request):
         u_id = int(request.user.id)
         id=CustomUser.objects.get(id=u_id).empid
         emp_obj=Employee.objects.get(empid=id)
-        if(emp_obj.led_projects.count()==0):
-            alert="No projects assigned"
-        else:
-            if(emp_obj.role == 'team leader'):            
+        if (emp_obj.role == 'team leader'):
+            if(emp_obj.led_projects.count()==0):
+                return HttpResponse ("No projects assigned")
+            else :
                 project_obj=Project.objects.filter(team_lead=emp_obj).order_by('end_date').select_related('client_details')
                 count_obj=project_obj.annotate(t_count=Count('tasks')).annotate(pending_count=Count('tasks', filter=Q(tasks__status='completed')))
-            else:
-
+        elif(emp_obj.role == 'team member') : 
+            if(emp_obj.projects.count()==0):
+                return HttpResponse ("No projects assigned")
+            else :           
                 member_projects=emp_obj.projects.values_list('projectid',flat=True)
-                projects=emp_obj.projects.projectid
+                # projects=emp_obj.projects.projectid
                 project_obj=Project.objects.filter(projectid__in=member_projects).order_by('end_date').select_related('client_details')
                 count_obj=project_obj.annotate(t_count=Count('tasks')).annotate(pending_count=Count('tasks', filter=Q(tasks__status='completed')))
-            return  render(request,"project_det.html",{"pro_det":count_obj})
+        else:
+            return HttpResponse("Invalid user")
+        return  render(request,"project_det.html",{"pro_det":count_obj})
     else:
         return HttpResponse("invalid user")
     
@@ -303,7 +307,11 @@ def project_detailed_view(request,projectid):
         emp_obj=Employee.objects.get(empid=id)
         project_det=Project.objects.get(projectid=projectid)
         client_det=project_det.client_details
-        tasks_det=Task.objects.filter(project=projectid).select_related('assigned_to').order_by('-status')
+        
+        if(emp_obj.role == 'team leader'):
+            tasks_det=Task.objects.filter(project=projectid).select_related('assigned_to').order_by('-status')
+        else:
+            tasks_det=Task.objects.filter(project=projectid,assigned_to=emp_obj).select_related('assigned_to').order_by('-status')
         team_member_id=list(project_det.team_members.values_list('empid', flat=True))
         tot_emp=Employee.objects.exclude(Q(empid=request.user.id) | Q(empid__in=team_member_id ) | Q(is_active=False))
         pro_comment=ProjectCommentMedia.objects.filter(project=project_det).select_related('uploaded_by')\

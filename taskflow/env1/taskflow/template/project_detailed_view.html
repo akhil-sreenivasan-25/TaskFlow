@@ -72,8 +72,10 @@
                 <thead class="bg-gray-200">
                     <tr>
                       <th class="px-4 py-2">Task ID</th>
-                      <th class="px-4 py-2">Member</th>
-                      <th class="px-4 py-2">Role</th>
+                      {% if role.role == 'team leader' %}
+                        <th class="px-4 py-2">Member</th>
+                        <th class="px-4 py-2">Role</th>
+                      {% endif %}
                       <th class="px-4 py-2">Task</th>
                       <th class="px-4 py-2">Status</th>
                       <th class="px-4 py-2">Priority</th>
@@ -87,8 +89,10 @@
                   {% for tasks in tasks %}
                     <tr class="border-t">
                       <td class="px-4 py-2 font-medium">{{tasks.taskid}}</td>
-                      <td class="px-4 py-2 font-medium">{{tasks.assigned_to.name}}</td>
-                      <td class="px-4 py-2">{{tasks.assigned_to.role}}</td>
+                      {% if role.role == 'team leader' %}
+                        <td class="px-4 py-2 font-medium">{{tasks.assigned_to.name}}</td>
+                        <td class="px-4 py-2">{{tasks.assigned_to.role}}</td>
+                      {% endif %}
                       <td class="px-4 py-2">{{tasks.title}}</td>
                       <td class="px-4 py-2 text-green-600">{{tasks.status}}</td>
                       <td class="px-4 py-2">{{tasks.priority}}</td>
