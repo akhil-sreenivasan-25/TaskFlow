@@ -129,3 +129,15 @@ class tasktMedia(models.Model):
     comment=models.ForeignKey(taskCommentMedia,on_delete=models.CASCADE,related_name='task_media_files')
     file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
     uploaded_at=models.DateTimeField(auto_now_add=True)
+
+class taskFinalCode(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_code')
+    code = models.TextField()
+    file = models.FileField( blank=True, null=True)
+    uploaded_by = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class tasktFinalMedia(models.Model):
+    code=models.ForeignKey(taskFinalCode,on_delete=models.CASCADE,related_name='task_code_files')
+    file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
+    uploaded_at=models.DateTimeField(auto_now_add=True)

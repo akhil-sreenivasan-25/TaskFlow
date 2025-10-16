@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia,taskCommentMedia,tasktMedia
+from .models import taskFinalCode,tasktFinalMedia
 from datetime import date,timedelta
 from datetime import datetime
 from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch,F
@@ -396,11 +397,17 @@ def project_comments(request,projectid):
 # view for specific task details
 def pro_task_view(request,taskid):
     if request.user.is_authenticated:
-        try:
+        try:            
+            u_id =int(request.user.id)
+            id=CustomUser.objects.get(id=u_id).empid
+            emp_obj=Employee.objects.get(empid=id)
             task_det=Task.objects.select_related('assigned_to','project__team_lead').get(taskid=taskid)
             task_comment=taskCommentMedia.objects.filter(task=task_det).select_related('uploaded_by')\
-            .prefetch_related(Prefetch('task_media_files', queryset=tasktMedia.objects.only('file'))).order_by('-uploaded_at')
-            return render(request,"pro_task_view.html",{"tasks":task_det,"comments_task":task_comment})
+                .prefetch_related(Prefetch('task_media_files', queryset=tasktMedia.objects.only('file'))).order_by('-uploaded_at')
+            task_code=None
+            if task_det.status=='completed':
+                task_code=taskFinalCode.objects.filter(task=task_det).prefetch_related('task_code_files').order_by('uploaded_at').first()
+            return render(request,"pro_task_view.html",{"tasks":task_det,"role":emp_obj,"comments_task":task_comment,"task_code":task_code})
         except Task.DoesNotExist:
             return HttpResponse("Task does not exist")
     else:
@@ -413,12 +420,32 @@ def change_task_status(request,task_id,new_status):
             try:
                 task_obj=Task.objects.get(taskid=task_id)
                 if task_obj.status == new_status:
-                    return HttpResponse("Status is already set to " + new_status)
-                else:
+                    return HttpResponse("Status is already set to " + new_status)            
+                else: 
                     task_obj.status=new_status
                     task_obj.save()
                     return HttpResponse("Task status updated to " + new_status)
+                
             except Task.DoesNotExist:
+                return HttpResponse("Task does not exist")
+        elif request.method=='POST':
+            try:
+                task_obj=Task.objects.get(taskid=task_id)
+                code=request.POST.get("code")
+                attachment=request.FILES.getlist("taskCodeAttachment")            
+                user=request.user.id
+                emp_id=CustomUser.objects.get(id=user).empid
+                emp_id=Employee.objects.get(empid=emp_id)
+                if(new_status == 'completed' and task_obj):
+                    task_obj.status=new_status
+                    task_obj.save()
+                    task_code=taskFinalCode(task=task_obj,uploaded_by=emp_id,code=code)
+                    task_code.save()
+                    for file in attachment:
+                        media=tasktFinalMedia(code=task_code,file=file)
+                        media.save()
+                    return HttpResponse("Task status updated to " + new_status)
+            except:
                 return HttpResponse("Task does not exist")
         else:
             return HttpResponse("invalid access")

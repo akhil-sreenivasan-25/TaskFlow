@@ -404,14 +404,24 @@
       if (e.target && e.target.id === 'selectElementTask') {
           const taskid=document.getElementById('task_id').value;
           const task_status=String(e.target.value);
-          fetch(`/change_task_status/${taskid}/${task_status}/`)
+          if(task_status == 'in_progress' || task_status == 'pending'){
+            taskStatus(taskid,task_status);
+          }
+          if(task_status == 'completed'){
+            document.getElementById('taskComplete').style.display = 'block';
+
+          }                  
+      }
+    });
+    // function for status update of tasks
+    function taskStatus(taskid,task_status){
+      fetch(`/change_task_status/${taskid}/${task_status}/`)
             .then(response => response.text())
             .then(data => {
               taskDetails(taskid);
             })
             .catch(error => console.error('Error updating status:', error));
-      }
-    });
+    }
 
 
      // function for refresh page without redirection after comment submission - project detailed view page
@@ -470,6 +480,21 @@
       submitFormViaAjax(this, this.action, function(data) {
           closeModalProjectadd();
           proDetailView(data.pro_id); // Show project detail view
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById('taskSearch');
+
+      searchInput.addEventListener('input', function () {
+        alert("Search triggered!");  // This should fire when you type
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('taskTable');
+
+        rows.forEach(row => {
+          const rowText = row.textContent.toLowerCase();
+          row.style.display = rowText.includes(query) ? '' : 'none';
+        });
       });
     });
 
