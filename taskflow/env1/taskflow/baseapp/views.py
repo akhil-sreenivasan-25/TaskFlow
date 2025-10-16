@@ -405,8 +405,8 @@ def pro_task_view(request,taskid):
             task_comment=taskCommentMedia.objects.filter(task=task_det).select_related('uploaded_by')\
                 .prefetch_related(Prefetch('task_media_files', queryset=tasktMedia.objects.only('file'))).order_by('-uploaded_at')
             task_code=None
-            if task_det.status in ('completed','under review') :
-                task_code=taskFinalCode.objects.filter(task=task_det).prefetch_related('task_code_files').order_by('uploaded_at').first()
+            
+            task_code=taskFinalCode.objects.filter(task=task_det).prefetch_related('task_code_files').order_by('-uploaded_at').first()
             return render(request,"pro_task_view.html",{"tasks":task_det,"role":emp_obj,"comments_task":task_comment,"task_code":task_code})
         except Task.DoesNotExist:
             return HttpResponse("Task does not exist")

@@ -404,11 +404,12 @@
       if (e.target && e.target.id === 'selectElementTask') {
           const taskid=document.getElementById('task_id').value;
           const task_status=String(e.target.value);
-          if(task_status == 'in progress' || task_status == 'pending'){
-            alert("done");
+          if(task_status == 'in progress' || task_status == 'pending'){            
             taskStatus(taskid,task_status);
           }
           if(task_status == 'under review'){
+            const task_code=document.getElementById('taskCode')
+            task_code.style.display = 'none';
             document.getElementById('taskComplete').style.display = 'block';
 
           }                  

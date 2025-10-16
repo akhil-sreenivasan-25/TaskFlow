@@ -1,0 +1,3 @@
+tl_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
+team_member=task.object.filter(project__in=tl_project).exclude(status='completed').value('assigned_to')
+team_mem_id=employee.object.filter(emp_id__in=team_member).exclude('emp_id'=emp_obj.emp_id)

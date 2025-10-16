@@ -61,14 +61,11 @@
             <h3 class="text-xl font-bold mb-4">Requirement</h3>
             <p>{{tasks.description}}</p>
           </div>
-          <br>
-          {% if tasks.status == 'completed' or tasks.status == 'under review'  %}
-            <div>
+          <br>        
+          {% if task_code %}
+            <div id="taskCode">
               <label for="code" class="block text-sm font-medium text-gray-700">Code...</label>
-              <textarea readonly id="code" name="code" rows="12" class="mt-1 block w-full rounded-md border border-blue-300 shadow-md ring-2 ring-blue-300 focus:ring-blue-500" required>{{ task_code.code }}</textarea><br>
-            </div>
-
-            <div>
+              <textarea readonly id="code" name="code" rows="12" class="mt-1 block w-full rounded-md border border-blue-300 shadow-md ring-2 ring-blue-300 focus:ring-blue-500" required>{{ task_code.code }}</textarea><br>                       
               {% for media in task_code.task_code_files.all %}
                   {% if media.file %}
                     {% with media.file.name|cut:"images/"|cut:"docs/"|cut:"spreadsheets/" as filename %}
@@ -77,9 +74,9 @@
                       </p>
                     {% endwith %}
                   {% endif %}
-                {% endfor %}                
+              {% endfor %}
+              <p class="text-xs text-gray-400">{{ task_code.uploaded_at }}</p><br>                
             </div>
-            <p class="text-xs text-gray-400">{{ task_code.uploaded_at }}</p><br>
             {% if role.role == 'team leader' and tasks.status == 'under review' %}
               <form method="POST" action="{% url 'task_approve_reject' tasks.taskid %}" target="hiddenFrame" onsubmit="return  handleSubmitButtonTask();" >
                 {% csrf_token %}
@@ -97,8 +94,7 @@
           <div id="taskComplete" class="bg-white shadow-md rounded-lg p-6" style="display: none;">
             <form method="POST" action="{% url 'change_task_status' tasks.taskid 'under review' %}" target="hiddenFrame" onsubmit="return  handleSubmitButtonTask();" enctype="multipart/form-data" class="space-y-4">
               {% csrf_token %}            
-              <div>
-                <input type="hidden ">
+              <div>              
                 <label for="code" class="block text-sm font-medium text-gray-700">Code...</label>
                 <textarea id="code" name="code" rows="12" class="mt-1 block w-full rounded-md border border-blue-300 shadow-md ring-2 ring-blue-300 focus:ring-blue-500 focus:border-blue-500" required></textarea><br>
               </div>
