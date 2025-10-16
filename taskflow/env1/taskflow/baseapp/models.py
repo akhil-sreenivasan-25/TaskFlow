@@ -59,7 +59,7 @@ class Task(models.Model):
     description=models.TextField()
     assigned_to=models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='e_tasks') #linked employee table based on task assigning
     project=models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks') #linked project table based on which project belong this task
-    status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in progress', 'In Progress'), ('completed', 'Completed')], default='pending')
+    status=models.CharField(max_length=50, choices=[('pending', 'Pending'), ('in progress', 'In Progress'),('under review','Mark completed'), ('completed', 'Completed')], default='pending')
     priority=models.CharField(max_length=50, choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], default='medium')
     due_date=models.DateField(null=True, blank=True)
     created_at=models.DateTimeField(auto_now_add=True)

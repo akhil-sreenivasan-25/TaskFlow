@@ -40,5 +40,6 @@ urlpatterns = [
     path('change_task_status/<int:task_id>/<str:new_status>/', views.change_task_status, name='change_task_status'),
     path('task_comments/<int:taskid>/',views.task_comments,name='task_comments'),
     path('task_details/',views.task_det,name='task_details'),
-    path('tl_projects/',views.tl_projects,name='tl_projects')
+    path('tl_projects/',views.tl_projects,name='tl_projects'),
+    path('task_approve_reject/<int:taskid>/',views.task_approve_reject,name='task_approve_reject')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

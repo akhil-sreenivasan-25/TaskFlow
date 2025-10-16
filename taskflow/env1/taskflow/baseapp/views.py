@@ -89,7 +89,7 @@ def tl_home(request):
          tl_projects=emp_obj.led_projects.exclude(status='completed').values_list('projectid', flat=True)
          tl_tasks=Task.objects.filter(project__in=tl_projects).count()
          # active task count group by project and status in in_progress and pending
-         tl_tasks_progress=Task.objects.filter(project__in=tl_projects,status__in=('in_progress','pending'))\
+         tl_tasks_progress=Task.objects.filter(project__in=tl_projects,status__in=('in progress','pending'))\
             .values('project').annotate(t_count=ExpressionWrapper((Count('taskid') / Value(tl_tasks)) , output_field=FloatField()))\
                 .values('project','project__project_name','t_count')
          
@@ -405,7 +405,7 @@ def pro_task_view(request,taskid):
             task_comment=taskCommentMedia.objects.filter(task=task_det).select_related('uploaded_by')\
                 .prefetch_related(Prefetch('task_media_files', queryset=tasktMedia.objects.only('file'))).order_by('-uploaded_at')
             task_code=None
-            if task_det.status=='completed':
+            if task_det.status in ('completed','under review') :
                 task_code=taskFinalCode.objects.filter(task=task_det).prefetch_related('task_code_files').order_by('uploaded_at').first()
             return render(request,"pro_task_view.html",{"tasks":task_det,"role":emp_obj,"comments_task":task_comment,"task_code":task_code})
         except Task.DoesNotExist:
@@ -436,7 +436,7 @@ def change_task_status(request,task_id,new_status):
                 user=request.user.id
                 emp_id=CustomUser.objects.get(id=user).empid
                 emp_id=Employee.objects.get(empid=emp_id)
-                if(new_status == 'completed' and task_obj):
+                if(new_status == 'under review' and task_obj):
                     task_obj.status=new_status
                     task_obj.save()
                     task_code=taskFinalCode(task=task_obj,uploaded_by=emp_id,code=code)
@@ -451,6 +451,33 @@ def change_task_status(request,task_id,new_status):
             return HttpResponse("invalid access")
     else:
         return render(request,"log_page.html")
+    
+# for task final arroval or rejection from TL
+def task_approve_reject(request,taskid):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user=request.user.id
+            emp_id=CustomUser.objects.get(id=user).empid
+            emp_id=Employee.objects.get(empid=emp_id)
+            action=request.POST.get('task_button')
+            comment=request.POST.get('approveRejectMessage')
+            task_obj=Task.objects.get(taskid=taskid)
+            if action == 'approve':
+                task_obj.status = 'completed'
+                task_obj.save()
+            elif action == 'reject':
+                task_obj.status = 'in progress'
+                task_obj.save()
+            else:
+                return HttpResponse("invalid action")
+            task_comment=taskCommentMedia(task=task_obj,uploaded_by=emp_id,comment=comment)
+            task_comment.save()
+            return HttpResponse("status updated")
+        else:
+            return HttpResponse("invalid access")
+    else:
+        return render(request,'login_page.html')
+    
     
 def task_comments(request,taskid):
     if request.user.is_authenticated:

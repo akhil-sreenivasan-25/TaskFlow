@@ -38,15 +38,15 @@
                     <td class="px-4 py-2 text-green-600">{{tasks.status}}</td>
                     <td class="px-4 py-2">{{tasks.priority}}</td>
                     <td class="px-4 py-2">{{tasks.due_date}}</td>
-                    <td class="px-4 py-2">backend, auth, admin</td>
+                    <td class="px-4 py-2">backend, auth, admin {{tasks.status}}</td>
                     <td class="px-5 py-3 text-center">
                       <input type="hidden" id="task_id" value="{{tasks.taskid}}">
                         <select id="selectElementTask" class="px-2 py-1 text-blue-600 hover:underline" name="selectElementPro" >
                             <option value="">-- Change Status --</option>
-                            {% if tasks.status != 'completed' %}
-                              <option value="in_progress"> In progress </option>
+                            {% if tasks.status == 'in progress' or tasks.status == 'pending' %}
+                              <option value="in progress"> In progress </option>
                               <option value="pending"> Pending </option>
-                              <option value="completed"> Completed </option>
+                              <option value="under review"> Completed </option>
                             {% endif %}
                         </select>
                         <!-- ?<button class="px-2 py-1 text-blue-600 hover:underline" onclick="taskDetails('{{ tasks.taskid }}')">View</button> -->
@@ -62,7 +62,7 @@
             <p>{{tasks.description}}</p>
           </div>
           <br>
-          {% if tasks.status == 'completed' %}
+          {% if tasks.status == 'completed' or tasks.status == 'under review'  %}
             <div>
               <label for="code" class="block text-sm font-medium text-gray-700">Code...</label>
               <textarea readonly id="code" name="code" rows="12" class="mt-1 block w-full rounded-md border border-blue-300 shadow-md ring-2 ring-blue-300 focus:ring-blue-500" required>{{ task_code.code }}</textarea><br>
@@ -80,18 +80,22 @@
                 {% endfor %}                
             </div>
             <p class="text-xs text-gray-400">{{ task_code.uploaded_at }}</p><br>
-            {% if role.role == 'team leader' %}
-              <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
-                Approve
-              </button>
-              <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
-                Reject
-              </button>
+            {% if role.role == 'team leader' and tasks.status == 'under review' %}
+              <form method="POST" action="{% url 'task_approve_reject' tasks.taskid %}" target="hiddenFrame" onsubmit="return  handleSubmitButtonTask();" >
+                {% csrf_token %}
+                <textarea id="approveRejectMessage" name="approveRejectMessage" placeholder="Message..." rows="4" class="mt-1 block w-full rounded-md border border-blue-300 shadow-md ring-2 ring-blue-300 focus:ring-blue-500" required></textarea><br>
+                <button type="submit" name="task_button" value="approve" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                  Approve
+                </button>
+                <button type="submit" name="task_button" value="reject" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
+                  Reject
+                </button>
+              </form>
             {% endif %}
           {% endif %}
 
           <div id="taskComplete" class="bg-white shadow-md rounded-lg p-6" style="display: none;">
-            <form method="POST" action="{% url 'change_task_status' tasks.taskid 'completed' %}" target="hiddenFrame" onsubmit="return  handleSubmitButtonTask();" enctype="multipart/form-data" class="space-y-4">
+            <form method="POST" action="{% url 'change_task_status' tasks.taskid 'under review' %}" target="hiddenFrame" onsubmit="return  handleSubmitButtonTask();" enctype="multipart/form-data" class="space-y-4">
               {% csrf_token %}            
               <div>
                 <input type="hidden ">
