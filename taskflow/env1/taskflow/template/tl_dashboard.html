@@ -261,6 +261,17 @@
                 </ul>
               </section>
 
+              <!-- sample notification -->
+              <section class="bg-white rounded-xl shadow-sm">
+                <div id="notification-tab">
+                  <div class="p-5 border-b">
+                    <h2 class="font-semibold text-lg">Notifications</h2>
+                  </div>
+                  <ul id="notification-list" class="p-5 space-y-3 text-sm"></ul>
+                </div>
+              </section>
+
+
               <!-- Reports & Analytics (simple bar chart) -->
               <section class="bg-white rounded-xl shadow-sm">
                 <div class="p-5 border-b">
@@ -289,6 +300,50 @@
 
   <!-- JavaScript to handle tab swapping -->
   <script>
+
+
+    function fetchNotifications(){
+      fetch('/notifications/')
+      .then(response => response.json())
+      .then(data => {
+        const list = document.getElementById('notification-list');
+        list.innerHTML = '';
+        if (data.length <= 0 ){
+          const empty = document.createElement('li');
+          empty.className = 'text-gray-500 p-2';
+          empty.textContent = 'No notifications yet.';
+          list.appendChild(empty);
+
+        } 
+        else{
+          data.forEach(note => {
+          const item = document.createElement('li');
+          item.className = 'p-2 rounded cursor-pointer transition hover:bg-gray-200';
+          item.textContent = note.message ;
+
+          if (!note.read) {
+            item.classList.add('bg-blue-100', 'font-semibold');
+          } else {
+            item.classList.add('bg-gray-100', 'text-gray-600');
+          }
+
+          // item.onclick = () => {
+          //   markAsRead(note.id);
+          //   window.location.href = note.redirect_url;
+          // };
+
+          list.appendChild(item);
+        });
+        }         
+        
+      });
+
+    }
+
+    window.onload = fetchNotifications;
+    setInterval(fetchNotifications, 5000);
+
+
     // for project tab swap
     document.getElementById('projectId').addEventListener('click', function(e) {
       e.preventDefault();

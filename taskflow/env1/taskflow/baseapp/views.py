@@ -3,10 +3,11 @@ from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,projectMedia,taskCommentMedia,tasktMedia
-from .models import taskFinalCode,tasktFinalMedia
+from .models import taskFinalCode,tasktFinalMedia,taskNotification
 from datetime import date,timedelta
 from datetime import datetime
-from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch,F
+from django.db.models.functions import Now
+from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch,F,DurationField
 
 # Create your views here.
 def test(request):
@@ -517,3 +518,13 @@ def task_det(request):
         return render(request,"task_det.html",{"task_det":task_obj})
     else:
         return render(request,"log_page.html")
+    
+def get_notifications(request):
+    if request.user.is_authenticated :
+        user=request.user
+        notification=taskNotification.objects.filter(user=user).order_by('is_read','-timestamp')
+        data= [
+            { 'id':n.id, 'message':n.message, 'read':n.is_read, 'time':n.timestamp }
+            for n in notification
+        ]
+        return JsonResponse(data, safe=False)
