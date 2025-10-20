@@ -11,7 +11,7 @@ TaskFlow is a Django-powered task management application designed to streamline 
 
 Tech Stack:
   - Backend: Django, PostgreSQL
-  - Frontend: HTML, CSS, Bootstrap
+  - Frontend: HTML, CSS, tailwindcss
 
 run :
   - cd env1/taskflow
