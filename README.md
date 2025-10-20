@@ -6,11 +6,10 @@ TaskFlow is a Django-powered task management application designed to streamline 
   - Task creation, editing, and deletion
   - Due dates, priority levels, and status tracking
   - Dashboard with task overview and filters
-  - Email notifications and reminders
   - Responsive design for desktop and mobile
 
 Tech Stack:
-  - Backend: Django, PostgreSQL
+  - Backend: Django, PostgreSQL, Object Relational Mapping
   - Frontend: HTML, CSS, tailwindcss
 
 run :
