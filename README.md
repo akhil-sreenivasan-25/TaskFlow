@@ -13,8 +13,9 @@ Tech Stack:
   - Backend: Django, PostgreSQL
   - Frontend: HTML, CSS, Bootstrap
 
-run
-  cd env1/taskflow
-  pip install -r requirements.txt
-  python manage.py migrate
-  python manage.py runserver
+run :
+  - cd env1/taskflow
+  - pip install -r requirements.txt
+  - python manage.py migrate
+  - python manage.py runserver
+  
