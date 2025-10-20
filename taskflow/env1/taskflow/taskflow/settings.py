@@ -134,6 +134,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # For global static files
+]
+
+
 # multimedia files settings
 MEDIA_URL = '/files/' 
 MEDIA_ROOT = BASE_DIR / 'files'

@@ -1,4 +1,4 @@
-from django.shortcuts import render,HttpResponse,redirect,HttpResponseRedirect
+from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
@@ -6,13 +6,9 @@ from .models import CustomUser,Employee,Project,Task,client,ProjectCommentMedia,
 from .models import taskFinalCode,tasktFinalMedia,taskNotification
 from datetime import date,timedelta
 from datetime import datetime
-from django.db.models.functions import Now
-from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch,F,DurationField
+from django.db.models import Count,ExpressionWrapper,IntegerField,Value,FloatField,Q,Prefetch,F
 
 # Create your views here.
-def test(request):
-    return HttpResponse("test page")
-
 #user authentication and login
 def login_page(request):
     if request.method=="POST":
@@ -76,16 +72,10 @@ def tl_home(request):
          #team management
          # Select distinct employees who are assigned to tasks in any of the projects led by the current team lead (tl_projects)
          tl_projects=emp_obj.led_projects.exclude(status='completed').values('projectid')
-         #for find task count foe each employee under specific tl. not completed
-         #task_det=Employee.objects.filter(e_tasks__project__in=tl_projects).annotate(t_count=Count('e_task'))#.distinct()
-         #team_members=Employee.objects.distinct().exclude(empid=emp_obj.empid)
-         
-         team_members=Employee.objects.filter(e_tasks__project__in=tl_projects).distinct().exclude(empid=emp_obj.empid).annotate(member_task_count=Count('e_tasks'))
-         #member_task_count=Task
-
+         #for find task count foe each employee under specific tl. not completed         
+         team_members=Employee.objects.filter(e_tasks__project__in=tl_projects,e_tasks__status__in=('pending','in progress','under review')).distinct().exclude(empid=emp_obj.empid).annotate(member_task_count=Count('e_tasks'))
          #task tracking
-         tl_all_tasks=Task.objects.filter(project__in=tl_projects).order_by('due_date')[:8]
-
+         tl_all_tasks=Task.objects.filter(project__in=tl_projects).order_by('due_date')[:9]
          #project progress
          tl_projects=emp_obj.led_projects.exclude(status='completed').values_list('projectid', flat=True)
          tl_tasks=Task.objects.filter(project__in=tl_projects).count()
@@ -105,8 +95,6 @@ def tl_home(request):
             annotate(total=Count('taskid'),taskcompleted=Count('taskid', filter=Q(status='completed')))\
                      .annotate(percent_completed=ExpressionWrapper(100.0 * F('taskcompleted') / F('total'),output_field=IntegerField()))\
                         .order_by('project__end_date') 
-        #  test=test.annotate((pro_prec= 'test.taskcompleted' / 'test.total') * 100 )
-
          task_det=0
          return  render(request,"tl_dashboard.html",{"count":tl_count,"emp_manage":team_members,"pro_tasks":tl_all_tasks,"test_data":test,"emp_det":tot_emp,"emp_obj":emp_obj,"pro_details":test})
     else:
@@ -123,7 +111,7 @@ def member_home(request):
             project_count=0
             task_count=0
             deadline_count=0          
-            return HttpResponse(str(project_count) + str(task_count) + str(deadline_count))
+            # return HttpResponse(str(project_count) + str(task_count) + str(deadline_count))
         else:
             project_count= emp_obj.projects.exclude(status='completed').count()
             member_projects=emp_obj.projects.exclude(status='completed').values('projectid')
@@ -145,8 +133,7 @@ def member_home(request):
                      .annotate(percent_completed=ExpressionWrapper(100.0 * F('taskcompleted') / F('total'),output_field=IntegerField()))\
                         .order_by('project__end_date')
      
-        return  render(request,"tl_dashboard.html",{"count":tl_count,"pro_tasks":mem_all_tasks,"pro_details":test,"test_data":test,"emp_obj":emp_obj,"pro_details":test})
-        return HttpResponse( "i am"+str(project_count) + "hy" + str(member_projects)  + "you"+ str(task_count))
+        return  render(request,"tl_dashboard.html",{"count":tl_count,"pro_tasks":mem_all_tasks,"pro_details":test,"test_data":test,"emp_obj":emp_obj,"pro_details":test})        
     else:
         return render(request,"log_page.html")
     
@@ -160,7 +147,6 @@ def add_project(request):
             client_id=request.POST.get("client")
             client_obj=client.objects.get(clientid=client_id)            
             #p_end = datetime.strptime(p_end, '%d-%m-%Y').strftime('%Y-%m-%d')
-
             p_members=request.POST.getlist("p_members") # Get list of selected team members
             # return HttpResponse("list is"+str(p_members))
             u_id = int(request.user.id)
@@ -168,7 +154,6 @@ def add_project(request):
             tl_emp=Employee.objects.get(empid=id) 
             new_project=Project(project_name=p_name,description=p_desc,end_date=p_end,team_lead=tl_emp,client_details=client_obj)
             new_project.save()
-
             # Add selected team members to the project
             for member_id in p_members:
                 try:
@@ -176,16 +161,15 @@ def add_project(request):
                     new_project.team_members.add(member_emp)
                 except Employee.DoesNotExist:
                     continue  # Skip if the employee does not exist
-
             new_project.save()
             projectid=new_project.projectid
             return JsonResponse({"success": True, "pro_id":projectid})
-
         else:
             return JsonResponse({"success": False, "pro_id":projectid})
     else:
         return render(request,"log_page.html")
     
+#project edit tab
 def project_edit(request):
     if request.user.is_authenticated:
         if request.method=="POST":
@@ -207,11 +191,11 @@ def project_edit(request):
             return HttpResponse("done")
             # return redirect('project_detailed_view',projectid=project_id.projectid)
         else:
-            return HttpResponse("invalid access")
-        
+            return HttpResponse("invalid access")        
     else:
         return render(request,"log_page.html")
     
+# for adding to task to a existing project
 def add_task(request):
     if request.user.is_authenticated:
         if request.method=="POST":
@@ -222,7 +206,6 @@ def add_task(request):
             t_priority=request.POST.get("t_priority")
             t_assigned=request.POST.get("assign_to")
             t_project=request.POST.get("pId")
-
             u_id = int(request.user.id)
             id=CustomUser.objects.get(id=u_id).empid
             tl_emp=Employee.objects.get(empid=id) 
@@ -266,15 +249,16 @@ def tl_projects(request):
         else :
             return render(request,"log_page.html")
 
+# fetching client details based on login user
 def client_det(request):
     if request.user.is_authenticated:
         clients=client.objects.filter(is_active=True)
         data = [{'id': client.clientid, 'company': client.company_name} for client in clients]
-        return JsonResponse(data, safe=False)
-        
+        return JsonResponse(data, safe=False)        
     else:
         return HttpResponse("invalid user")
 
+# project tab view
 def project_home(request):
     if request.user.is_authenticated:
         u_id = int(request.user.id)
@@ -334,7 +318,7 @@ def project_edit_view(request,projectid):
         id=CustomUser.objects.get(id=u_id).empid
         project_det=Project.objects.get(projectid=projectid)
         team_member_id=list(project_det.team_members.values_list('empid', flat=True))
-        tot_emp=Employee.objects.exclude(Q(empid=id) | Q(empid__in=team_member_id ) | Q(is_active=False)).values('empid','name')
+        tot_emp=Employee.objects.exclude(Q(empid=id) | Q(empid__in=team_member_id ) | Q(is_active=False)).values('empid','name')        
         # data=tot_emp.values_list('empid','name')
         return JsonResponse(list(tot_emp),safe=False)
     else:
@@ -368,7 +352,7 @@ def project_status_change(request,projectid,pro_status):
     else:
         return render(request,"log_page.html")
     
-
+# save project comment
 def project_comments(request,projectid):
     if request.user.is_authenticated:
         if request.method=="POST":
@@ -387,7 +371,6 @@ def project_comments(request,projectid):
                 # return redirect('project_detailed_view',projectid=projectid)
             else:
                 return HttpResponse("Invalid project or User")
-
             # process and save the comment and attachment as needed
             return HttpResponse("Comment and attachment received" + str(projectid) +   str(emp_id) + " "+ str(emp_id.empid))
         else:
@@ -480,6 +463,7 @@ def task_approve_reject(request,taskid):
         return render(request,'login_page.html')
     
     
+# task comment
 def task_comments(request,taskid):
     if request.user.is_authenticated:
         if request.method=="POST":
@@ -498,7 +482,6 @@ def task_comments(request,taskid):
                 # return redirect('project_detailed_view',projectid=projectid)
             else:
                 return HttpResponse("Invalid task or User")
-
             # process and save the comment and attachment as needed
             return HttpResponse("Comment and attachment received" + str(taskid) +   str(emp_id) + " "+ str(emp_id.empid))
         else:
@@ -506,6 +489,7 @@ def task_comments(request,taskid):
     else:
         return HttpResponse("task comments page")
 
+# task details - task tab
 def task_det(request):
     if request.user.is_authenticated:
         u_id =int(request.user.id)
@@ -515,10 +499,11 @@ def task_det(request):
             task_obj=Task.objects.filter(project__team_lead=emp_obj).select_related('assigned_to').order_by('-status','due_date')
         else :
             task_obj=Task.objects.filter(assigned_to=emp_obj).select_related('assigned_to').order_by('-status','due_date')
-        return render(request,"task_det.html",{"task_det":task_obj})
+        return render(request,"task_det.html",{"task_det":task_obj,"role":emp_obj})
     else:
         return render(request,"log_page.html")
     
+# upcoming feature - notification
 def get_notifications(request):
     if request.user.is_authenticated :
         user=request.user

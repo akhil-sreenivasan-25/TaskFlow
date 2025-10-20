@@ -8,12 +8,9 @@
 </head>
 <body class="bg-gray-100 p-6 font-sans">
 
-  <div class="max-w-8xl mx-auto">
-    <!-- <h1 class="text-3xl font-bold mb-6">Task Dashboard</h1> -->
+  <div class="max-w-8xl mx-auto">    
     <input type="text" id="taskSearch" placeholder="Search tasks..." class="w-48 px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring focus:border-blue-300"/>
-    <!-- Project Cards -->
     <div >
-
        <!-- Team Member Task Table -->
         <div class="bg-white shadow-md rounded-lg p-6">
           <!-- <h3 class="text-xl font-bold mb-4">Tasks</h3> -->
@@ -57,9 +54,7 @@
                         <!-- ?<button class="px-2 py-1 text-blue-600 hover:underline" onclick="taskDetails('{{ tasks.taskid }}')">View</button> -->
                     </td>
                   </tr>
-                {% endfor %}
-                
-                <!-- Repeat for other members -->
+                {% endfor %}                              
               </tbody>
             </table>
           </div>

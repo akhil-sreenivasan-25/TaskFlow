@@ -102,9 +102,12 @@
 
   <!-- Profile Icon -->
     <div id="empMenu" class="profile-container">
+      {% load static %}
       <div id="empprofileMenu" class="profile-dropdown hidden">
         <div class="profile-header">
-          <div class="w-9 h-9 rounded-full bg-blue-500 ring-2 ring-blue-200 flex items-center justify-center text-white font-semibold"> AK</div>&nbsp;&nbsp;&nbsp;
+          <div class="w-9 h-9 rounded-full ring-2 ring-blue-200 overflow-hidden">
+            <img src="{% static 'img/dp_1.png' %}" alt="Profile" class="w-full h-full object-cover" />
+          </div>&nbsp;&nbsp;&nbsp;
           <div class="user-info">
             <p class="user-name">{{ emp_obj.name }}</p>
             <p class="user-email">{{ emp_obj.email }}</p>

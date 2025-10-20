@@ -209,14 +209,8 @@
           <label>Project name :</label>
           <input type="text" name="p_name" id="projectNameEdit" required>
           <label>Discription :</label>
-          <textarea id="descriptionEdit" name="p_desc" rows="4" placeholder='Add content...' ></textarea>
-          <!-- <input type="text" name="p_desc" id="projectDscription" placeholder="Disccription" required><br> -->
-          <!-- <label>End Date   :</label>
-          <input type="date" name="p_end" id="projectdate" placeholder="End Date" value="{{ project.end_date }}" required><br> -->
-          
+          <textarea id="descriptionEdit" name="p_desc" rows="4" placeholder='Add content...' ></textarea>          
         </div>
-
-
         <div class="container">
           <div class="select-btn-open" onclick="toggleDropdownempedit(this)">
             <span class="btn-text">Select Team Members</span>
@@ -224,7 +218,6 @@
               <i class="fa-solid fa-chevron-down"></i>
             </span>
           </div>
-
           <!-- This UL must be directly under .container -->
           <ul id="checkbox-container" class="list-items">
             <!-- JavaScript will inject <li> items here -->
@@ -286,9 +279,6 @@
     }, 500); // slight delay to allow server to respond
     return true;
   }
-
-
-
 
   function closeModalProject() {
     document.getElementById("projectModalEdit").style.display = "none";

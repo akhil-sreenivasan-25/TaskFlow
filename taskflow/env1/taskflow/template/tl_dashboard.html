@@ -8,11 +8,14 @@
 </head>
 <body class="bg-slate-50 text-slate-800">
   <div class="flex min-h-screen">
+    {% load static %}
 
     <!-- Sidebar -->
     <aside class="fixed top-0 left-0 h-screen w-64 bg-slate-900 text-slate-100 flex flex-col">
       <div class="px-6 py-5 border-b border-slate-800 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-blue-500"></div>
+        <div class="w-9 h-9 rounded-full ring-2 ring-blue-200 overflow-hidden">
+          <img src="{% static 'img/taskFlow.png' %}" alt="Profile" class="w-full h-full object-cover" />
+        </div>
         <span class="text-xl font-semibold">TaskFlow</span>
       </div>
       <nav class="p-3 space-y-1 text-sm">
@@ -26,9 +29,7 @@
           </a>
         {% endif %}
         <a id="projectId" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📁 Projects</a>
-        <a id="taskId" onclick="openTask()" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">✅ Tasks</a>
-        <!-- <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">📊 Reports</a>
-        <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">⚙️ Settings</a> -->
+        <a id="taskId" onclick="openTask()" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800" href="#">✅ Tasks</a>      
       </nav>
       <div class="mt-auto p-4 text-xs text-slate-400">© TaskFlow</div>
     </aside>
@@ -41,7 +42,7 @@
           <h1 >Dashboard</h1>
         </div>
         <!-- <h1 class="text-2xl md:text-3xl font-bold">Dashboard</h1> -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3">          
           <!-- pop window included -->
           {% include 'project_add.html' %} 
           {% include 'task_add.html' %}
@@ -51,8 +52,10 @@
           {% if count.user_det == 'team leader' %}
             <button onclick="openModalProject()" class="hidden md:inline-flex px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" >+ New Project</button>
             <button onclick="openModalTask()" class="px-3 py-2 bg-slate-200 rounded-lg hover:bg-slate-300">+ New Task</button>
-          {% endif %}
-          <button id="profileId" onclick="toggleProfileMenu()" class="w-9 h-9 rounded-full bg-blue-500 ring-2 ring-blue-200 flex items-center justify-center text-white font-semibold"> AK</button>
+          {% endif %} <button id="profileId" onclick="toggleProfileMenu()" class="w-9 h-9 rounded-full ring-2 ring-blue-200 overflow-hidden">
+            <img src="{% static 'img/dp_1.png' %}" alt="Profile" class="w-full h-full object-cover" />
+          </button>
+         
         </div>
       </header>
 
@@ -61,7 +64,7 @@
         <!-- count session -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div id="proCount" class="bg-white rounded-xl shadow-sm p-5">
-            <p class="text-slate-500 text-sm">Total Projects</p>
+            <p class="text-slate-500 text-sm">Active Projects</p>
             <p class="text-3xl font-semibold">{{count.p_count}}</p>
           </div>
           <div onclick="openTask()" class="bg-white rounded-xl shadow-sm p-5">
@@ -91,8 +94,7 @@
                           <th class="px-5 py-3">Name</th>
                           <th class="px-5 py-3">Role</th>
                           <th class="px-5 py-3">Status</th>
-                          <th class="px-5 py-3">Tasks Assigned</th>
-                          <th class="px-5 py-3 text-center">Actions</th>
+                          <th class="px-5 py-3">Tasks Assigned</th>                        
                         </tr>
                       </thead>
                       <tbody>
@@ -109,10 +111,7 @@
                                   {% endif %}                          
                                 </span>
                               </td>
-                              <td class="px-5 py-3">{{emp.member_task_count}}</td>
-                              <td class="px-5 py-3 text-center">
-                                <button class="px-2 py-1 text-blue-600 hover:underline"> bhh</button>
-                              </td>                      
+                              <td class="px-5 py-3">{{emp.member_task_count}}</td>                                                
                           </tr>
                         {% endfor %}
                       </tbody>
@@ -127,22 +126,18 @@
                   <h2 class="font-semibold text-lg">Task Tracking</h2>
                   <div class="text-sm text-slate-500">Drag & drop (coming soon)</div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
                   {% for task in pro_tasks %}
                       <!-- To Do -->
                       {% if task.status == 'pending' %}
                         <div onclick="taskDetails1('{{ task.taskid }}' , '{{ task.project.projectid }}')" class="bg-slate-50 rounded-lg p-3">
                           <h3 class="font-medium mb-3">To Do </h3>
-                          <div class="space-y-3">
-                            <!-- {% if task.status == 'pending' %} -->
+                          <div class="space-y-3">                            
                               <div class="p-3 bg-white rounded-md border">
-                                <input type="hidden" id="task_value" value="{{ task.taskid }}" />
-                                
+                                <input type="hidden" id="task_value" value="{{ task.taskid }}" />                                
                                 <p class="font-medium">{{ task.title }}</p>
                                 <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
-                              </div>
-                            <!-- {% endif %} -->
+                              </div>                          
                           </div>
                         </div>
                       {% endif %}
@@ -164,13 +159,11 @@
                       {% if task.status == 'completed' %}
                         <div onclick="taskDetails1('{{ task.taskid }}' , '{{ task.project.projectid }}')" class="bg-slate-50 rounded-lg p-3">
                           <h3 class="font-medium mb-3">Completed</h3>
-                          <div class="space-y-3">
-                            <!-- {% if task.status == 'completed' %} -->
+                          <div class="space-y-3">                            
                               <div class="p-3 bg-white rounded-md border">
                                 <p class="font-medium">{{ task.title }}</p>
                                 <div class="mt-1 text-xs text-slate-500">Due: {{task.due_date}} • <span class="text-rose-600 font-medium">{{task.priority}}</span></div>
-                              </div>
-                            <!-- {% endif %} -->
+                              </div>                            
                           </div>
                         </div>
                       {% endif %}
@@ -233,62 +226,9 @@
 
                     </div>
                   {% endfor %} 
-                  <div onclick="projectView()" class="flex justify-between text-sm mb-1">
-                    <!-- <button class="px-2 py-1 text-blue-600 hover:underline">... More projects ...</button> -->
+                  <div onclick="projectView()" class="flex justify-between text-sm mb-1">                    
                     <a></a><span id="pro_per"><button class="px-2 py-1 text-blue-600 hover:underline">... More projects ...</button></span>
                   </div>                             
-                </div>
-              </section>
-
-              <!-- Notifications -->
-              <section class="bg-white rounded-xl shadow-sm">
-                <div class="p-5 border-b">
-                  <h2 class="font-semibold text-lg">Notifications</h2>
-                </div>
-                <ul class="p-5 space-y-3 text-sm">
-                  <li class="flex items-start gap-3">
-                    <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                    <div><span class="font-medium">Akhil</span> assigned you a task • <span class="text-slate-500">10m ago</span></div>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                    <div>Task <span class="font-medium">“Design Homepage”</span> due tomorrow • <span class="text-slate-500">1h ago</span></div>
-                  </li>
-                  <li class="flex items-start gap-3">
-                    <span class="mt-1 inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                    <div><span class="font-medium">Sarah</span> commented on <span class="font-medium">“Implement Auth”</span> • <span class="text-slate-500">3h ago</span></div>
-                  </li>
-                </ul>
-              </section>
-
-              <!-- sample notification -->
-              <section class="bg-white rounded-xl shadow-sm">
-                <div id="notification-tab">
-                  <div class="p-5 border-b">
-                    <h2 class="font-semibold text-lg">Notifications</h2>
-                  </div>
-                  <ul id="notification-list" class="p-5 space-y-3 text-sm"></ul>
-                </div>
-              </section>
-
-
-              <!-- Reports & Analytics (simple bar chart) -->
-              <section class="bg-white rounded-xl shadow-sm">
-                <div class="p-5 border-b">
-                  <h2 class="font-semibold text-lg">Reports & Analytics</h2>
-                </div>
-                <div class="p-5">
-                  <p class="text-sm text-slate-500 mb-3">Weekly Productivity</p>
-                  <div class="flex items-end gap-3 h-40">
-                    <div class="w-8 bg-blue-200 rounded-t h-16"></div>
-                    <div class="w-8 bg-blue-300 rounded-t h-24"></div>
-                    <div class="w-8 bg-blue-400 rounded-t h-32"></div>
-                    <div class="w-8 bg-blue-300 rounded-t h-24"></div>
-                    <div class="w-8 bg-blue-400 rounded-t h-28"></div>
-                  </div>
-                  <div class="flex justify-between text-xs text-slate-500 mt-2">
-                    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span>
-                  </div>
                 </div>
               </section>
             </div>
@@ -300,50 +240,7 @@
 
   <!-- JavaScript to handle tab swapping -->
   <script>
-
-
-    function fetchNotifications(){
-      fetch('/notifications/')
-      .then(response => response.json())
-      .then(data => {
-        const list = document.getElementById('notification-list');
-        list.innerHTML = '';
-        if (data.length <= 0 ){
-          const empty = document.createElement('li');
-          empty.className = 'text-gray-500 p-2';
-          empty.textContent = 'No notifications yet.';
-          list.appendChild(empty);
-
-        } 
-        else{
-          data.forEach(note => {
-          const item = document.createElement('li');
-          item.className = 'p-2 rounded cursor-pointer transition hover:bg-gray-200';
-          item.textContent = note.message ;
-
-          if (!note.read) {
-            item.classList.add('bg-blue-100', 'font-semibold');
-          } else {
-            item.classList.add('bg-gray-100', 'text-gray-600');
-          }
-
-          // item.onclick = () => {
-          //   markAsRead(note.id);
-          //   window.location.href = note.redirect_url;
-          // };
-
-          list.appendChild(item);
-        });
-        }         
-        
-      });
-
-    }
-
-    window.onload = fetchNotifications;
-    setInterval(fetchNotifications, 5000);
-
-
+    
     // for project tab swap
     document.getElementById('projectId').addEventListener('click', function(e) {
       e.preventDefault();
@@ -539,23 +436,7 @@
           proDetailView(data.pro_id); // Show project detail view
       });
     });
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const searchInput = document.getElementById('taskSearch');
-
-      searchInput.addEventListener('input', function () {
-        alert("Search triggered!");  // This should fire when you type
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('taskTable');
-
-        rows.forEach(row => {
-          const rowText = row.textContent.toLowerCase();
-          row.style.display = rowText.includes(query) ? '' : 'none';
-        });
-      });
-    });
-
-
+        
   </script>
 </body>
 </html>

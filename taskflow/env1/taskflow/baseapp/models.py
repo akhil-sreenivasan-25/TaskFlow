@@ -92,9 +92,6 @@ def media_upload_path(instance, filename):
             context_id = 'unknown'
     else:
         context_id = 'unknown'
-
-
-
     return f'project_media/{context_id}/{folder}/{filename}'
     # return f'project_media/project_{project_id}/{folder}/{filename}'
 
@@ -126,11 +123,13 @@ class taskCommentMedia(models.Model):
     # def __str__(self):
     #     return f"Comment by {self.uploaded_by} on {self.project.name}"
 
+# task comment 
 class tasktMedia(models.Model):
     comment=models.ForeignKey(taskCommentMedia,on_delete=models.CASCADE,related_name='task_media_files')
     file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
     uploaded_at=models.DateTimeField(auto_now_add=True)
 
+# task final code
 class taskFinalCode(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='task_code')
     code = models.TextField()
@@ -138,11 +137,13 @@ class taskFinalCode(models.Model):
     uploaded_by = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+# task final media
 class tasktFinalMedia(models.Model):
     code=models.ForeignKey(taskFinalCode,on_delete=models.CASCADE,related_name='task_code_files')
     file=models.FileField(upload_to=media_upload_path, blank=True, null=True) 
     uploaded_at=models.DateTimeField(auto_now_add=True)
 
+# task notification - upcoming
 class taskNotification(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL ,on_delete=models.CASCADE)
     message=models.TextField()
